@@ -1,2 +1,2 @@
 # Medi-connect
-Lets start working gay ass nigger.
+Lets start working gay ass nigger...
