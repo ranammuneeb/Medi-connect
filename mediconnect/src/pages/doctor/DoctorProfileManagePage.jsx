@@ -1,182 +1,136 @@
-import { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
-import { motion } from 'framer-motion';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from 'react';
 import DoctorSidebar from '../../components/doctor/DoctorSidebar';
 import { doctorsAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const timeSlotOptions = [
-  '09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM',
-  '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM',
-];
+const timeSlotOptions = ['09:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', '01:00 PM', '02:00 PM', '03:00 PM', '04:00 PM', '05:00 PM'];
+
+const inputStyle = { width: '100%', padding: '9px 12px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.88rem', outline: 'none' };
 
 export default function DoctorProfileManagePage() {
   const { user, updateUser } = useAuth();
   const [saving, setSaving] = useState(false);
   const [availability, setAvailability] = useState({});
 
-  const { data: doctorProfile, isLoading } = useQuery({
-    queryKey: ['doctorProfile', user?.doctorId],
-    queryFn: () => doctorsAPI.getById(user?.doctorId),
-    enabled: !!user?.doctorId,
-    onSuccess: (data) => {
-      if (data?.availability) setAvailability(data.availability);
-    },
-  });
+  const [name, setName] = useState(user?.name || '');
+  const [phone, setPhone] = useState('');
+  const [bio, setBio] = useState('');
+  const [fee, setFee] = useState('');
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    defaultValues: {
-      name: user?.name || '',
-      email: user?.email || '',
-      phone: doctorProfile?.phone || '',
-      bio: doctorProfile?.bio || '',
-      consultationFee: doctorProfile?.consultationFee || '',
-    },
-  });
+  useEffect(() => {
+    if (user?.doctorId) {
+      doctorsAPI.getById(user.doctorId).then((doc) => {
+        if (doc) {
+          setPhone(doc.phone || '');
+          setBio(doc.bio || '');
+          setFee(doc.consultationFee || '');
+          setAvailability(doc.availability || {});
+        }
+      });
+    }
+  }, [user?.doctorId]);
 
   const toggleSlot = (day, slot) => {
     setAvailability((prev) => {
       const current = prev[day] || [];
-      const updated = current.includes(slot)
-        ? current.filter((s) => s !== slot)
-        : [...current, slot];
+      const updated = current.includes(slot) ? current.filter((s) => s !== slot) : [...current, slot];
       return { ...prev, [day]: updated };
     });
   };
 
-  const onSubmit = async (data) => {
+  const handleSave = async (e) => {
+    e.preventDefault();
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 600));
-    if (user?.doctorId) {
-      await doctorsAPI.update(user.doctorId, { ...data, availability });
+    try {
+      if (user?.doctorId) {
+        await doctorsAPI.update(user.doctorId, { phone, bio, consultationFee: fee, availability });
+      }
+      updateUser({ name });
+      alert('Profile updated successfully!');
+    } catch {
+      alert('Failed to save changes');
+    } finally {
+      setSaving(false);
     }
-    updateUser({ name: data.name });
-    toast.success('Profile updated! ✅');
-    setSaving(false);
   };
 
-  if (isLoading) {
-    return (
-      <div className="admin-layout">
-        <DoctorSidebar />
-        <div className="doctor-content p-4">
-          <div className="skeleton" style={{ height: 400, borderRadius: 16 }} />
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="admin-layout">
+    <div className="doctor-layout">
       <DoctorSidebar />
       <div className="doctor-content">
-        <div style={{ background: 'linear-gradient(135deg, #134e4a 0%, #0f766e 100%)', padding: '24px 32px' }}>
-          <h1 style={{ color: '#fff', fontWeight: 800, fontSize: '1.8rem', marginBottom: 4 }}>My Profile</h1>
-          <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: 0 }}>Manage your profile and availability</p>
+        <div style={{ marginBottom: 28 }}>
+          <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: 4 }}>Profile Settings</h1>
+          <p style={{ color: '#6b7280', fontSize: '0.88rem' }}>Manage your professional information</p>
         </div>
 
-        <div className="p-4">
-          <div className="row g-4">
-            {/* Profile Card */}
-            <div className="col-md-3">
-              <div className="card p-4 text-center">
-                <img
-                  src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Dr')}&size=128`}
-                  alt="Avatar"
-                  className="rounded-circle mx-auto mb-3"
-                  style={{ width: 100, height: 100, objectFit: 'cover', border: '3px solid #ccfbf1' }}
-                />
-                <h5 className="fw-bold mb-1">{user?.name}</h5>
-                <span className="badge" style={{ background: '#0f766e', color: '#fff' }}>
-                  {doctorProfile?.specialty || 'Doctor'}
-                </span>
-                <p className="text-muted mt-2 mb-0" style={{ fontSize: '0.82rem' }}>
-                  ⭐ {doctorProfile?.rating} • {doctorProfile?.experience} yrs exp
-                </p>
+        <form onSubmit={handleSave}>
+          {/* Basic info */}
+          <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: 24, marginBottom: 20 }}>
+            <h3 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 16 }}>Basic Information</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 500, color: '#6b7280', marginBottom: 5 }}>Full Name</label>
+                <input style={inputStyle} value={name} onChange={(e) => setName(e.target.value)} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 500, color: '#6b7280', marginBottom: 5 }}>Email</label>
+                <input style={{ ...inputStyle, background: '#f9fafb', color: '#9ca3af' }} value={user?.email || ''} readOnly />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 500, color: '#6b7280', marginBottom: 5 }}>Phone</label>
+                <input style={inputStyle} value={phone} onChange={(e) => setPhone(e.target.value)} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 500, color: '#6b7280', marginBottom: 5 }}>Consultation Fee ($)</label>
+                <input style={inputStyle} type="number" min={0} value={fee} onChange={(e) => setFee(e.target.value)} />
+              </div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 500, color: '#6b7280', marginBottom: 5 }}>Bio</label>
+                <textarea style={{ ...inputStyle, resize: 'vertical' }} rows={3} value={bio} onChange={(e) => setBio(e.target.value)} />
               </div>
             </div>
-
-            {/* Form */}
-            <div className="col-md-9">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4 }}
-              >
-                <form onSubmit={handleSubmit(onSubmit)}>
-                  <div className="card p-4 mb-4">
-                    <h5 className="fw-bold mb-4">📝 Personal Information</h5>
-                    <div className="row g-3">
-                      <div className="col-md-6">
-                        <label className="form-label fw-semibold">Full Name *</label>
-                        <input className={`form-control ${errors.name ? 'is-invalid' : ''}`}
-                          {...register('name', { required: 'Name is required' })} />
-                        {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label fw-semibold">Email</label>
-                        <input type="email" className="form-control" {...register('email')} />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label fw-semibold">Phone</label>
-                        <input className="form-control" placeholder="+1 (555) 000-0000" {...register('phone')} />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="form-label fw-semibold">Consultation Fee ($)</label>
-                        <input type="number" className="form-control" {...register('consultationFee')} />
-                      </div>
-                      <div className="col-12">
-                        <label className="form-label fw-semibold">Bio / About</label>
-                        <textarea className="form-control" rows={3}
-                          placeholder="Describe your expertise and approach..."
-                          {...register('bio')} />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Availability */}
-                  <div className="card p-4 mb-4">
-                    <h5 className="fw-bold mb-4">📅 Weekly Availability</h5>
-                    <p className="text-muted mb-3" style={{ fontSize: '0.85rem' }}>
-                      Click time slots to toggle availability for each day.
-                    </p>
-                    {days.map((day) => (
-                      <div key={day} className="mb-3">
-                        <div className="fw-semibold mb-2" style={{ fontSize: '0.9rem' }}>{day}</div>
-                        <div className="d-flex flex-wrap">
-                          {timeSlotOptions.map((slot) => {
-                            const isSelected = (availability[day] || []).includes(slot);
-                            return (
-                              <button
-                                key={slot}
-                                type="button"
-                                className={`time-slot-btn ${isSelected ? 'selected' : ''}`}
-                                onClick={() => toggleSlot(day, slot)}
-                              >
-                                {slot}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="d-flex gap-3">
-                    <button type="submit" className="btn btn-primary px-4" disabled={saving}>
-                      {saving ? (
-                        <><span className="spinner-border spinner-border-sm me-2" />Saving...</>
-                      ) : '💾 Save Changes'}
-                    </button>
-                  </div>
-                </form>
-              </motion.div>
-            </div>
           </div>
-        </div>
+
+          {/* Availability */}
+          <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: 24, marginBottom: 24 }}>
+            <h3 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 16 }}>Availability Schedule</h3>
+            {days.map((day) => (
+              <div key={day} style={{ marginBottom: 16 }}>
+                <div style={{ fontSize: '0.88rem', fontWeight: 600, color: '#374151', marginBottom: 8 }}>{day}</div>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                  {timeSlotOptions.map((slot) => {
+                    const active = (availability[day] || []).includes(slot);
+                    return (
+                      <button
+                        key={slot}
+                        type="button"
+                        onClick={() => toggleSlot(day, slot)}
+                        style={{
+                          padding: '6px 14px',
+                          border: `1px solid ${active ? '#5f6fff' : '#e5e7eb'}`,
+                          borderRadius: 50,
+                          background: active ? '#5f6fff' : '#fff',
+                          color: active ? '#fff' : '#6b7280',
+                          fontSize: '0.78rem',
+                          cursor: 'pointer',
+                          fontWeight: active ? 600 : 400,
+                          transition: 'all 0.15s',
+                        }}
+                      >
+                        {slot}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button type="submit" className="btn-primary" style={{ borderRadius: 8, padding: '10px 28px' }} disabled={saving}>
+            {saving ? 'Saving...' : 'Save changes'}
+          </button>
+        </form>
       </div>
     </div>
   );

@@ -14,6 +14,8 @@ import AppointmentBookingPage from './pages/patient/AppointmentBookingPage';
 import MyAppointmentsPage from './pages/patient/MyAppointmentsPage';
 import PatientProfilePage from './pages/patient/PatientProfilePage';
 import PaymentPage from './pages/patient/PaymentPage';
+import AboutPage from './pages/patient/AboutPage';
+import ContactPage from './pages/patient/ContactPage';
 
 // Admin Pages
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
@@ -55,6 +57,8 @@ export default function App() {
             <Route path="payment/:appointmentId" element={<PaymentPage />} />
             <Route path="appointments" element={<MyAppointmentsPage />} />
             <Route path="profile" element={<PatientProfilePage />} />
+            <Route path="about" element={<AboutPage />} />
+            <Route path="contact" element={<ContactPage />} />
             <Route path="*" element={<Navigate to="home" replace />} />
           </Routes>
         </ProtectedRoute>

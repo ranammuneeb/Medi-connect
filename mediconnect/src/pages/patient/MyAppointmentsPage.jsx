@@ -1,166 +1,123 @@
-import { useState } from 'react';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { motion, AnimatePresence } from 'framer-motion';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from 'react';
 import PatientNavbar from '../../components/common/PatientNavbar';
 import { appointmentsAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { queryClient } from '../../lib/queryClient';
-
-const tabs = ['upcoming', 'completed', 'cancelled'];
-const statusColors = {
-  confirmed: 'badge-confirmed',
-  pending: 'badge-pending',
-  cancelled: 'badge-cancelled',
-  completed: 'badge-completed',
-};
+import { doctors } from '../../assets/assets';
 
 export default function MyAppointmentsPage() {
-  const [activeTab, setActiveTab] = useState('upcoming');
   const { user } = useAuth();
+  const [appointments, setAppointments] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const { data: appointments = [], isLoading } = useQuery({
-    queryKey: ['appointments', user?.id],
-    queryFn: () => appointmentsAPI.getAll({ patientId: user?.id }),
-    enabled: !!user?.id,
-  });
+  const fetchAppointments = async () => {
+    setLoading(true);
+    try {
+      const data = await appointmentsAPI.getAll({ patientId: user?.id });
+      setAppointments(data);
+    } catch {
+      setAppointments([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const { mutate: cancelAppointment } = useMutation({
-    mutationFn: (id) => appointmentsAPI.cancel(id),
-    onSuccess: () => {
-      toast.success('Appointment cancelled');
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-    },
-    onError: () => toast.error('Failed to cancel appointment'),
-  });
+  useEffect(() => {
+    if (user?.id) fetchAppointments();
+  }, [user?.id]);
+
+  const handleCancel = async (id) => {
+    if (!window.confirm('Cancel this appointment?')) return;
+    try {
+      await appointmentsAPI.cancel(id);
+      fetchAppointments();
+    } catch {
+      alert('Failed to cancel appointment');
+    }
+  };
+
+  // Find doctor image from assets
+  const getDoctorImage = (doctorName) => {
+    const match = doctors.find((d) => d.name === doctorName);
+    return match ? match.image : null;
+  };
+
+  const statusClass = {
+    confirmed: 'status-confirmed',
+    pending: 'status-pending',
+    cancelled: 'status-cancelled',
+    completed: 'status-completed',
+  };
 
   const now = new Date();
-  const filtered = appointments.filter((a) => {
-    const apptDate = new Date(a.date);
-    if (activeTab === 'upcoming') return (a.status === 'confirmed' || a.status === 'pending') && apptDate >= now;
-    if (activeTab === 'completed') return a.status === 'completed' || apptDate < now;
-    if (activeTab === 'cancelled') return a.status === 'cancelled';
-    return true;
-  });
 
   return (
     <div>
       <PatientNavbar />
 
-      <div style={{ background: 'linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%)', padding: '40px 0' }}>
-        <div className="container">
-          <h1 style={{ color: '#fff', fontWeight: 800, fontSize: '2rem' }}>My Appointments</h1>
-          <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: 0 }}>
-            Total: {appointments.length} appointments
-          </p>
-        </div>
-      </div>
+      <div style={{ padding: '32px 40px', maxWidth: 860, margin: '0 auto' }}>
+        <h2 style={{ fontWeight: 700, fontSize: '1.3rem', marginBottom: 4 }}>My appointments</h2>
+        <p style={{ color: '#6b7280', fontSize: '0.88rem', marginBottom: 28 }}>
+          {appointments.length} appointment{appointments.length !== 1 ? 's' : ''}
+        </p>
 
-      <div className="container py-4">
-        {/* Tabs */}
-        <div className="d-flex gap-2 mb-4">
-          {tabs.map((tab) => (
-            <button
-              key={tab}
-              className={`btn ${activeTab === tab ? 'btn-primary' : 'btn-outline-secondary'}`}
-              style={{ textTransform: 'capitalize', borderRadius: 8 }}
-              onClick={() => setActiveTab(tab)}
-            >
-              {tab} ({appointments.filter((a) => {
-                const d = new Date(a.date);
-                if (tab === 'upcoming') return (a.status === 'confirmed' || a.status === 'pending') && d >= now;
-                if (tab === 'completed') return a.status === 'completed' || d < now;
-                return a.status === tab;
-              }).length})
-            </button>
-          ))}
-        </div>
-
-        {isLoading && (
-          <div className="text-center py-5">
-            <div className="spinner-border text-primary" />
-            <p className="mt-2 text-muted">Loading appointments...</p>
+        {loading ? (
+          <div style={{ textAlign: 'center', padding: '60px 0', color: '#6b7280' }}>
+            Loading...
           </div>
-        )}
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {!isLoading && filtered.length === 0 ? (
-              <div className="text-center py-5">
-                <div style={{ fontSize: '4rem' }}>📭</div>
-                <h4 className="text-muted mt-3">No {activeTab} appointments</h4>
-                <p className="text-muted">
-                  {activeTab === 'upcoming' ? "You don't have any upcoming appointments." :
-                    activeTab === 'completed' ? 'No completed appointments yet.' :
-                      'No cancelled appointments.'}
-                </p>
-              </div>
-            ) : (
-              <div className="row g-3">
-                {filtered.map((appt) => (
-                  <div key={appt.id} className="col-12">
-                    <div className="card p-4">
-                      <div className="d-flex flex-column flex-md-row justify-content-between gap-3">
-                        <div className="d-flex gap-3">
-                          <div style={{
-                            width: 60, height: 60, borderRadius: 12,
-                            background: 'linear-gradient(135deg, #0d6efd, #0dcaf0)',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            color: '#fff', fontSize: '1.5rem', flexShrink: 0,
-                          }}>
-                            👨‍⚕️
-                          </div>
-                          <div>
-                            <h5 className="fw-bold mb-1">{appt.doctorName}</h5>
-                            <p className="text-muted mb-1" style={{ fontSize: '0.88rem' }}>
-                              🏥 {appt.specialty}
-                            </p>
-                            <p className="text-muted mb-1" style={{ fontSize: '0.88rem' }}>
-                              📅 {appt.date} • ⏰ {appt.time}
-                            </p>
-                            {appt.symptoms && (
-                              <p className="text-muted mb-0" style={{ fontSize: '0.85rem' }}>
-                                📝 {appt.symptoms}
-                              </p>
-                            )}
-                          </div>
-                        </div>
-                        <div className="d-flex flex-column align-items-end gap-2">
-                          <span className={`badge-status ${statusColors[appt.status] || 'badge-pending'}`}>
-                            {appt.status}
-                          </span>
-                          <div className="fw-bold text-primary">${appt.fee}</div>
-                          <span style={{ fontSize: '0.75rem', color: '#6c757d' }}>
-                            {appt.paymentStatus === 'paid' ? '✅ Paid' : '⏳ Pending'}
-                          </span>
-                          {(appt.status === 'confirmed' || appt.status === 'pending') &&
-                            new Date(appt.date) >= now && (
-                              <button
-                                className="btn btn-danger btn-sm"
-                                onClick={() => {
-                                  if (window.confirm('Cancel this appointment?')) {
-                                    cancelAppointment(appt.id);
-                                  }
-                                }}
-                              >
-                                Cancel
-                              </button>
-                            )}
-                        </div>
-                      </div>
-                    </div>
+        ) : appointments.length === 0 ? (
+          <div style={{ textAlign: 'center', padding: '60px 0', color: '#6b7280' }}>
+            <div style={{ fontSize: '3rem', marginBottom: 12 }}>📭</div>
+            <h3 style={{ marginBottom: 8 }}>No appointments yet</h3>
+            <p>Book your first appointment with a trusted doctor.</p>
+          </div>
+        ) : (
+          appointments.map((appt) => {
+            const docImage = getDoctorImage(appt.doctorName);
+            const apptDate = new Date(appt.date);
+            const isUpcoming = (appt.status === 'confirmed' || appt.status === 'pending') && apptDate >= now;
+            return (
+              <div key={appt.id} className="appt-card">
+                {/* Doctor image */}
+                {docImage ? (
+                  <img src={docImage} alt={appt.doctorName} className="appt-doctor-img" />
+                ) : (
+                  <div className="appt-doctor-img" style={{ background: '#eef0ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}>
+                    👨‍⚕️
                   </div>
-                ))}
+                )}
+
+                {/* Info */}
+                <div className="appt-info">
+                  <div className="appt-name">{appt.doctorName}</div>
+                  <div className="appt-meta">{appt.specialty}</div>
+                  <div className="appt-meta" style={{ marginTop: 4 }}>
+                    <strong>Date & Time:</strong> {appt.date}, {appt.time}
+                  </div>
+                  <div className="appt-meta" style={{ marginTop: 4 }}>
+                    <strong>Address:</strong> 17th Cross, Richmond Circle, Ring Road, London
+                  </div>
+                </div>
+
+                {/* Actions */}
+                <div className="appt-actions">
+                  <span className={`status-badge ${statusClass[appt.status] || 'status-pending'}`}>
+                    {appt.status}
+                  </span>
+                  {isUpcoming && (
+                    <button className="btn-cancel" onClick={() => handleCancel(appt.id)}>
+                      Cancel appointment
+                    </button>
+                  )}
+                  {appt.paymentStatus !== 'paid' && appt.status !== 'cancelled' && (
+                    <button className="btn-pay" onClick={() => alert('Payment flow coming soon')}>
+                      Pay online
+                    </button>
+                  )}
+                </div>
               </div>
-            )}
-          </motion.div>
-        </AnimatePresence>
+            );
+          })
+        )}
       </div>
     </div>
   );

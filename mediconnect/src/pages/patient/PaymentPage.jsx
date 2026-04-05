@@ -1,230 +1,162 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
-import { motion, AnimatePresence } from 'framer-motion';
-import toast from 'react-hot-toast';
 import PatientNavbar from '../../components/common/PatientNavbar';
 import { appointmentsAPI, paymentsAPI } from '../../services/api';
-import { queryClient } from '../../lib/queryClient';
+import { assets } from '../../assets/assets';
 
 export default function PaymentPage() {
   const { appointmentId } = useParams();
   const navigate = useNavigate();
-  const [paymentStep, setPaymentStep] = useState('form'); // 'form' | 'processing' | 'success' | 'failed'
+
+  const [appointment, setAppointment] = useState(null);
+  const [step, setStep] = useState('form'); // 'form' | 'processing' | 'success' | 'failed'
   const [txnId, setTxnId] = useState('');
+  const [error, setError] = useState('');
 
-  const { data: appointments = [] } = useQuery({
-    queryKey: ['appointments', 'all'],
-    queryFn: () => appointmentsAPI.getAll(),
-  });
+  // card fields
+  const [cardName, setCardName] = useState('');
+  const [cardNumber, setCardNumber] = useState('');
+  const [expiry, setExpiry] = useState('');
+  const [cvv, setCvv] = useState('');
 
-  const appointment = appointments.find((a) => a.id === appointmentId);
+  useEffect(() => {
+    appointmentsAPI.getAll().then((all) => {
+      const appt = all.find((a) => String(a.id) === String(appointmentId));
+      setAppointment(appt || null);
+    });
+  }, [appointmentId]);
 
-  const { register, handleSubmit, formState: { errors } } = useForm();
-
-  const { mutate: processPayment, isPending } = useMutation({
-    mutationFn: (data) =>
-      paymentsAPI.processPayment({
+  const handlePay = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (!cardName || !cardNumber || !expiry || !cvv) { setError('Please fill all card details'); return; }
+    setStep('processing');
+    try {
+      const result = await paymentsAPI.processPayment({
         appointmentId,
         amount: appointment?.fee || 0,
-        cardNumber: data.cardNumber,
-      }),
-    onMutate: () => setPaymentStep('processing'),
-    onSuccess: (result) => {
+        cardNumber,
+      });
       setTxnId(result.transactionId);
-      setPaymentStep('success');
-      queryClient.invalidateQueries({ queryKey: ['appointments'] });
-      toast.success('Payment successful! 🎉');
-    },
-    onError: (err) => {
-      setPaymentStep('failed');
-      toast.error(err.message || 'Payment failed');
-    },
-  });
-
-  if (!appointment && appointments.length > 0) {
-    return (
-      <div>
-        <PatientNavbar />
-        <div className="container py-5 text-center">
-          <h3>Appointment not found</h3>
-          <button className="btn btn-primary mt-3" onClick={() => navigate('/patient/appointments')}>
-            Go to Appointments
-          </button>
-        </div>
-      </div>
-    );
-  }
+      setStep('success');
+    } catch (err) {
+      setStep('failed');
+    }
+  };
 
   return (
     <div>
       <PatientNavbar />
+      <div style={{ maxWidth: 560, margin: '40px auto', padding: '0 20px' }}>
 
-      <div style={{ background: 'linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%)', padding: '30px 0' }}>
-        <div className="container">
-          <h1 style={{ color: '#fff', fontWeight: 800, fontSize: '1.8rem' }}>💳 Secure Payment</h1>
-          <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: 0 }}>Complete your appointment booking</p>
-        </div>
-      </div>
-
-      <div className="container py-5">
-        <div className="row justify-content-center">
-          <div className="col-md-6">
-
-            {/* Success State */}
-            <AnimatePresence mode="wait">
-              {paymentStep === 'success' && (
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
-                  className="card text-center p-5"
-                  style={{ border: '2px solid #198754' }}
-                >
-                  <div style={{ fontSize: '5rem', marginBottom: 16 }}>✅</div>
-                  <h3 className="fw-bold text-success mb-2">Payment Successful!</h3>
-                  <p className="text-muted mb-1">Your appointment has been confirmed.</p>
-                  <p className="text-muted mb-3" style={{ fontSize: '0.85rem' }}>
-                    Transaction ID: <strong>{txnId}</strong>
-                  </p>
-                  {appointment && (
-                    <div className="alert alert-success text-start" style={{ fontSize: '0.88rem' }}>
-                      <div><strong>Doctor:</strong> {appointment.doctorName}</div>
-                      <div><strong>Date:</strong> {appointment.date} at {appointment.time}</div>
-                      <div><strong>Amount:</strong> ${appointment.fee}</div>
-                    </div>
-                  )}
-                  <button className="btn btn-success w-100 mt-2" onClick={() => navigate('/patient/appointments')}>
-                    View My Appointments →
-                  </button>
-                </motion.div>
-              )}
-
-              {/* Failed State */}
-              {paymentStep === 'failed' && (
-                <motion.div
-                  key="failed"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="card text-center p-5"
-                  style={{ border: '2px solid #dc3545' }}
-                >
-                  <div style={{ fontSize: '5rem', marginBottom: 16 }}>❌</div>
-                  <h3 className="fw-bold text-danger mb-2">Payment Failed</h3>
-                  <p className="text-muted mb-3">Your card was declined. Please check your details.</p>
-                  <button className="btn btn-danger w-100" onClick={() => setPaymentStep('form')}>
-                    Try Again
-                  </button>
-                  <button className="btn btn-outline-secondary w-100 mt-2" onClick={() => navigate('/patient/appointments')}>
-                    Back to Appointments
-                  </button>
-                </motion.div>
-              )}
-
-              {/* Processing State */}
-              {paymentStep === 'processing' && (
-                <motion.div
-                  key="processing"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="card text-center p-5"
-                >
-                  <div className="spinner-border text-primary mb-4" style={{ width: 60, height: 60, margin: '0 auto' }} />
-                  <h4 className="fw-semibold">Processing Payment...</h4>
-                  <p className="text-muted">Please do not close this window</p>
-                </motion.div>
-              )}
-
-              {/* Payment Form */}
-              {paymentStep === 'form' && (
-                <motion.div
-                  key="form"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.4 }}
-                >
-                  {/* Order Summary */}
-                  {appointment && (
-                    <div className="card p-4 mb-4" style={{ border: '2px solid #e0f2fe' }}>
-                      <h5 className="fw-bold mb-3">📋 Order Summary</h5>
-                      <div className="d-flex justify-content-between mb-1">
-                        <span className="text-muted">Doctor</span>
-                        <strong>{appointment.doctorName}</strong>
-                      </div>
-                      <div className="d-flex justify-content-between mb-1">
-                        <span className="text-muted">Specialty</span>
-                        <strong>{appointment.specialty}</strong>
-                      </div>
-                      <div className="d-flex justify-content-between mb-1">
-                        <span className="text-muted">Date & Time</span>
-                        <strong>{appointment.date} • {appointment.time}</strong>
-                      </div>
-                      <hr />
-                      <div className="d-flex justify-content-between">
-                        <span className="fw-bold">Total</span>
-                        <span className="fw-bold text-primary" style={{ fontSize: '1.2rem' }}>${appointment.fee}</span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Card Details Form */}
-                  <div className="card p-4">
-                    <h5 className="fw-bold mb-4">💳 Card Details</h5>
-                    <form onSubmit={handleSubmit(processPayment)}>
-                      <div className="mb-3">
-                        <label className="form-label fw-semibold">Cardholder Name</label>
-                        <input className={`form-control ${errors.cardName ? 'is-invalid' : ''}`}
-                          placeholder="John Doe"
-                          {...register('cardName', { required: 'Name is required' })} />
-                        {errors.cardName && <div className="invalid-feedback">{errors.cardName.message}</div>}
-                      </div>
-                      <div className="mb-3">
-                        <label className="form-label fw-semibold">Card Number</label>
-                        <input
-                          className={`form-control ${errors.cardNumber ? 'is-invalid' : ''}`}
-                          placeholder="1234 5678 9012 3456"
-                          maxLength={19}
-                          {...register('cardNumber', {
-                            required: 'Card number is required',
-                            pattern: { value: /^[\d\s]{16,19}$/, message: 'Enter a valid card number' },
-                          })}
-                        />
-                        {errors.cardNumber && <div className="invalid-feedback">{errors.cardNumber.message}</div>}
-                      </div>
-                      <div className="row g-3 mb-3">
-                        <div className="col-6">
-                          <label className="form-label fw-semibold">Expiry Date</label>
-                          <input className="form-control" placeholder="MM / YY"
-                            {...register('expiry', { required: 'Required' })} />
-                        </div>
-                        <div className="col-6">
-                          <label className="form-label fw-semibold">CVV</label>
-                          <input className="form-control" placeholder="•••" maxLength={4}
-                            type="password"
-                            {...register('cvv', { required: 'Required', minLength: { value: 3, message: 'Min 3 digits' } })} />
-                        </div>
-                      </div>
-                      <div className="alert alert-info p-2 mb-3" style={{ fontSize: '0.8rem' }}>
-                        <strong>Test:</strong> Any valid card = success. Card ending in <strong>0000</strong> = failure.
-                      </div>
-                      <button type="submit" className="btn btn-primary w-100 py-2" style={{ fontSize: '1.05rem' }}>
-                        🔐 Pay ${appointment?.fee || '...'}
-                      </button>
-                    </form>
-                    <div className="text-center mt-2">
-                      <button className="btn btn-link text-muted" onClick={() => navigate(-1)}>
-                        ← Cancel and go back
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
+        {step === 'processing' && (
+          <div style={{ textAlign: 'center', padding: '80px 0' }}>
+            <div style={{ fontSize: '3rem', marginBottom: 16 }}>⏳</div>
+            <h3 style={{ fontWeight: 700, marginBottom: 8 }}>Processing Payment...</h3>
+            <p style={{ color: '#6b7280' }}>Please do not close this window</p>
           </div>
-        </div>
+        )}
+
+        {step === 'success' && (
+          <div style={{ textAlign: 'center', padding: '60px 20px', border: '2px solid #10b981', borderRadius: 16, background: '#f0fdf4' }}>
+            <div style={{ fontSize: '4rem', marginBottom: 16 }}>✅</div>
+            <h3 style={{ fontWeight: 700, color: '#065f46', marginBottom: 8 }}>Booking Confirmed!</h3>
+            {appointment && (
+              <div style={{ background: '#fff', borderRadius: 10, padding: '16px 20px', marginBottom: 20, textAlign: 'left', fontSize: '0.88rem', color: '#374151' }}>
+                <div style={{ marginBottom: 6 }}><strong>Doctor:</strong> {appointment.doctorName}</div>
+                <div style={{ marginBottom: 6 }}><strong>Date & Time:</strong> {appointment.date} at {appointment.time}</div>
+                <div><strong>Amount Paid:</strong> ${appointment.fee}</div>
+              </div>
+            )}
+            <p style={{ color: '#6b7280', fontSize: '0.82rem', marginBottom: 20 }}>Txn ID: {txnId}</p>
+            <button className="btn-primary" onClick={() => navigate('/patient/appointments')}>
+              My Appointments →
+            </button>
+          </div>
+        )}
+
+        {step === 'failed' && (
+          <div style={{ textAlign: 'center', padding: '60px 20px', border: '2px solid #ef4444', borderRadius: 16, background: '#fef2f2' }}>
+            <div style={{ fontSize: '4rem', marginBottom: 16 }}>❌</div>
+            <h3 style={{ fontWeight: 700, color: '#991b1b', marginBottom: 8 }}>Payment Failed</h3>
+            <p style={{ color: '#6b7280', marginBottom: 20 }}>Your card was declined. Please try again.</p>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+              <button className="btn-primary" style={{ background: '#ef4444' }} onClick={() => setStep('form')}>Try Again</button>
+              <button className="btn-outline" onClick={() => navigate('/patient/appointments')}>Back to Appointments</button>
+            </div>
+          </div>
+        )}
+
+        {step === 'form' && (
+          <div>
+            <h2 style={{ fontWeight: 700, marginBottom: 24 }}>Complete Payment</h2>
+
+            {/* Order summary */}
+            {appointment && (
+              <div style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: '16px 20px', marginBottom: 24, background: '#fff', fontSize: '0.9rem' }}>
+                <h3 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 12 }}>Order Summary</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ color: '#6b7280' }}>Doctor</span>
+                  <strong>{appointment.doctorName}</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                  <span style={{ color: '#6b7280' }}>Date & Time</span>
+                  <strong>{appointment.date} • {appointment.time}</strong>
+                </div>
+                <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '10px 0' }} />
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <strong>Total</strong>
+                  <strong style={{ color: '#5f6fff', fontSize: '1.1rem' }}>${appointment.fee}</strong>
+                </div>
+              </div>
+            )}
+
+            {/* Payment methods */}
+            <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+              <img src={assets.stripe_logo} alt="Stripe" style={{ height: 28, border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 8px', cursor: 'pointer' }} />
+              <img src={assets.razorpay_logo} alt="Razorpay" style={{ height: 28, border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 8px', cursor: 'pointer' }} />
+            </div>
+
+            {/* Card form */}
+            <form onSubmit={handlePay}>
+              <div className="form-group">
+                <label className="form-label">Cardholder Name</label>
+                <input className="form-input" placeholder="John Doe" value={cardName} onChange={(e) => setCardName(e.target.value)} />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Card Number</label>
+                <input className="form-input" placeholder="1234 5678 9012 3456" maxLength={19} value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} />
+              </div>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Expiry Date</label>
+                  <input className="form-input" placeholder="MM / YY" value={expiry} onChange={(e) => setExpiry(e.target.value)} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">CVV</label>
+                  <input className="form-input" type="password" placeholder="•••" maxLength={4} value={cvv} onChange={(e) => setCvv(e.target.value)} />
+                </div>
+              </div>
+
+              {error && (
+                <div style={{ background: '#fee2e2', color: '#991b1b', padding: '10px 14px', borderRadius: 8, fontSize: '0.85rem', marginBottom: 16 }}>
+                  {error}
+                </div>
+              )}
+
+              <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: 8 }}>
+                Pay ${appointment?.fee || '...'}
+              </button>
+              <button type="button" className="btn-outline" style={{ width: '100%', marginTop: 10, borderRadius: 8 }} onClick={() => navigate(-1)}>
+                Cancel
+              </button>
+            </form>
+
+            <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: 12, textAlign: 'center' }}>
+              Demo: any card = success. Card ending in 0000 = failure.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

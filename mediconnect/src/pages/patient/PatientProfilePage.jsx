@@ -1,31 +1,25 @@
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { motion } from 'framer-motion';
-import toast from 'react-hot-toast';
 import PatientNavbar from '../../components/common/PatientNavbar';
 import { useAuth } from '../../context/AuthContext';
+import { assets } from '../../assets/assets';
 
 export default function PatientProfilePage() {
   const { user, updateUser } = useAuth();
+  const [isEdit, setIsEdit] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    defaultValues: {
-      name: user?.name || '',
-      email: user?.email || '',
-      phone: user?.phone || '',
-      dob: user?.dob || '',
-      gender: user?.gender || '',
-      address: user?.address || '',
-      bloodGroup: user?.bloodGroup || '',
-    },
-  });
+  const [name, setName] = useState(user?.name || '');
+  const [phone, setPhone] = useState(user?.phone || '');
+  const [address1, setAddress1] = useState(user?.address1 || '');
+  const [address2, setAddress2] = useState(user?.address2 || '');
+  const [gender, setGender] = useState(user?.gender || 'Not Selected');
+  const [dob, setDob] = useState(user?.dob || '');
 
-  const onSubmit = async (data) => {
+  const handleSave = async () => {
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 600));
-    updateUser(data);
-    toast.success('Profile updated successfully! ✅');
+    await new Promise((r) => setTimeout(r, 500));
+    updateUser({ name, phone, address1, address2, gender, dob });
+    setIsEdit(false);
     setSaving(false);
   };
 
@@ -33,119 +27,108 @@ export default function PatientProfilePage() {
     <div>
       <PatientNavbar />
 
-      <div style={{ background: 'linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%)', padding: '40px 0' }}>
-        <div className="container">
-          <h1 style={{ color: '#fff', fontWeight: 800, fontSize: '2rem' }}>My Profile</h1>
-          <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: 0 }}>
-            Manage your personal information
-          </p>
-        </div>
-      </div>
-
-      <div className="container py-4">
-        <div className="row g-4">
-          {/* Avatar Card */}
-          <div className="col-md-3">
-            <div className="card p-4 text-center">
-              <img
-                src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&size=128`}
-                alt="Avatar"
-                className="rounded-circle mx-auto mb-3"
-                style={{ width: 100, height: 100, objectFit: 'cover', border: '3px solid #e0f2fe' }}
+      <div className="profile-form-page">
+        {/* Avatar + name */}
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20, marginBottom: 32 }}>
+          <div style={{ position: 'relative' }}>
+            <img
+              src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=5f6fff&color=fff&size=128`}
+              alt={user?.name}
+              style={{ width: 120, height: 120, borderRadius: 12, objectFit: 'cover', background: '#eef0ff' }}
+            />
+            {isEdit && (
+              <label style={{
+                position: 'absolute', bottom: 0, right: 0,
+                background: '#5f6fff', color: '#fff', borderRadius: '50%',
+                width: 28, height: 28, display: 'flex', alignItems: 'center',
+                justifyContent: 'center', cursor: 'pointer', fontSize: '0.8rem',
+              }}>
+                <img src={assets.upload_icon} alt="upload" style={{ width: 14, filter: 'brightness(10)' }} />
+              </label>
+            )}
+          </div>
+          <div>
+            {isEdit ? (
+              <input
+                className="form-input"
+                style={{ fontSize: '1.2rem', fontWeight: 700, border: 'none', borderBottom: '2px solid #5f6fff', borderRadius: 0, padding: '4px 0', width: 240 }}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
               />
-              <h5 className="fw-bold mb-1">{user?.name}</h5>
-              <span className="badge bg-primary">Patient</span>
-              <p className="text-muted mt-2 mb-0" style={{ fontSize: '0.82rem' }}>
-                Member since {user?.joinedDate || '—'}
-              </p>
-            </div>
-          </div>
-
-          {/* Profile Form */}
-          <div className="col-md-9">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="card p-4"
-            >
-              <h5 className="fw-bold mb-4">📝 Personal Information</h5>
-              <form onSubmit={handleSubmit(onSubmit)}>
-                <div className="row g-3">
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Full Name *</label>
-                    <input
-                      className={`form-control ${errors.name ? 'is-invalid' : ''}`}
-                      {...register('name', { required: 'Name is required', minLength: { value: 2, message: 'Too short' } })}
-                    />
-                    {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Email Address *</label>
-                    <input
-                      type="email"
-                      className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                      {...register('email', { required: 'Email is required', pattern: { value: /^\S+@\S+\.\S+$/, message: 'Invalid email' } })}
-                    />
-                    {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Phone Number</label>
-                    <input
-                      className="form-control"
-                      placeholder="+1 (555) 000-0000"
-                      {...register('phone')}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Date of Birth</label>
-                    <input
-                      type="date"
-                      className="form-control"
-                      {...register('dob')}
-                    />
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Gender</label>
-                    <select className="form-select" {...register('gender')}>
-                      <option value="">Select</option>
-                      <option>Male</option>
-                      <option>Female</option>
-                      <option>Other</option>
-                    </select>
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Blood Group</label>
-                    <select className="form-select" {...register('bloodGroup')}>
-                      <option value="">Select</option>
-                      {['A+','A-','B+','B-','AB+','AB-','O+','O-'].map((bg) => <option key={bg}>{bg}</option>)}
-                    </select>
-                  </div>
-                  <div className="col-12">
-                    <label className="form-label fw-semibold">Address</label>
-                    <textarea
-                      className="form-control"
-                      rows={2}
-                      placeholder="Street, City, State, ZIP"
-                      {...register('address')}
-                    />
-                  </div>
-                </div>
-
-                <div className="d-flex gap-3 mt-4">
-                  <button type="submit" className="btn btn-primary px-4" disabled={saving}>
-                    {saving ? (
-                      <><span className="spinner-border spinner-border-sm me-2" />Saving...</>
-                    ) : '💾 Save Changes'}
-                  </button>
-                  <button type="button" className="btn btn-outline-secondary px-4" onClick={() => window.location.reload()}>
-                    Reset
-                  </button>
-                </div>
-              </form>
-            </motion.div>
+            ) : (
+              <h2 style={{ fontWeight: 700, fontSize: '1.4rem' }}>{name}</h2>
+            )}
           </div>
         </div>
+
+        <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', marginBottom: 24 }} />
+
+        {/* Contact info */}
+        <h3 style={{ fontSize: '0.95rem', color: '#6b7280', fontWeight: 600, marginBottom: 16 }}>CONTACT INFORMATION</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: '12px 0', marginBottom: 32, fontSize: '0.9rem' }}>
+          <span style={{ color: '#6b7280', fontWeight: 500 }}>Email id:</span>
+          <span style={{ color: '#5f6fff' }}>{user?.email}</span>
+
+          <span style={{ color: '#6b7280', fontWeight: 500 }}>Phone:</span>
+          {isEdit ? (
+            <input className="form-input" style={{ padding: '6px 10px', maxWidth: 260 }} value={phone} onChange={(e) => setPhone(e.target.value)} />
+          ) : (
+            <span style={{ color: '#374151' }}>{phone || '—'}</span>
+          )}
+
+          <span style={{ color: '#6b7280', fontWeight: 500 }}>Address:</span>
+          {isEdit ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <input className="form-input" style={{ padding: '6px 10px', maxWidth: 320 }} placeholder="Line 1" value={address1} onChange={(e) => setAddress1(e.target.value)} />
+              <input className="form-input" style={{ padding: '6px 10px', maxWidth: 320 }} placeholder="Line 2" value={address2} onChange={(e) => setAddress2(e.target.value)} />
+            </div>
+          ) : (
+            <span style={{ color: '#374151' }}>
+              {address1 || '—'}{address2 ? <><br />{address2}</> : ''}
+            </span>
+          )}
+        </div>
+
+        <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', marginBottom: 24 }} />
+
+        {/* Basic info */}
+        <h3 style={{ fontSize: '0.95rem', color: '#6b7280', fontWeight: 600, marginBottom: 16 }}>BASIC INFORMATION</h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: '12px 0', fontSize: '0.9rem', marginBottom: 32 }}>
+          <span style={{ color: '#6b7280', fontWeight: 500 }}>Gender:</span>
+          {isEdit ? (
+            <select className="form-input" style={{ padding: '6px 10px', maxWidth: 200 }} value={gender} onChange={(e) => setGender(e.target.value)}>
+              <option>Not Selected</option>
+              <option>Male</option>
+              <option>Female</option>
+              <option>Other</option>
+            </select>
+          ) : (
+            <span style={{ color: '#374151' }}>{gender}</span>
+          )}
+
+          <span style={{ color: '#6b7280', fontWeight: 500 }}>Birthday:</span>
+          {isEdit ? (
+            <input type="date" className="form-input" style={{ padding: '6px 10px', maxWidth: 200 }} value={dob} onChange={(e) => setDob(e.target.value)} />
+          ) : (
+            <span style={{ color: '#374151' }}>{dob || '—'}</span>
+          )}
+        </div>
+
+        {/* Actions */}
+        {isEdit ? (
+          <div style={{ display: 'flex', gap: 12 }}>
+            <button className="btn-outline" onClick={() => setIsEdit(false)} style={{ borderRadius: 8, padding: '8px 24px' }}>
+              Cancel
+            </button>
+            <button className="btn-primary" onClick={handleSave} disabled={saving} style={{ borderRadius: 8, padding: '8px 24px' }}>
+              {saving ? 'Saving...' : 'Save information'}
+            </button>
+          </div>
+        ) : (
+          <button className="btn-outline" onClick={() => setIsEdit(true)} style={{ borderRadius: 8, padding: '8px 24px' }}>
+            Edit
+          </button>
+        )}
       </div>
     </div>
   );

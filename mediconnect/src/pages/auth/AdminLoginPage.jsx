@@ -1,85 +1,71 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-import { motion } from 'framer-motion';
-import toast from 'react-hot-toast';
+import { useNavigate, Link } from 'react-router-dom';
 import { authAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import { assets } from '../../assets/assets';
 
 export default function AdminLoginPage() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm();
 
-  const onSubmit = async (data) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    if (!email || !password) { setError('Please fill all fields'); return; }
     setLoading(true);
     try {
-      const user = await authAPI.login({ ...data, role: 'admin' });
+      const user = await authAPI.login({ email, password, role: 'admin' });
       login(user);
-      toast.success('Welcome, Admin! 🛡️');
       navigate('/admin/dashboard');
     } catch (err) {
-      toast.error(err.message || 'Login failed');
+      setError(err.message || 'Login failed');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #1e3a5f 0%, #0d6efd 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4 }}
-        className="auth-card"
-        style={{ maxWidth: 420 }}
-      >
-        <div className="text-center mb-4">
-          <div style={{ fontSize: '2.5rem', marginBottom: 8 }}>🛡️</div>
-          <h2 className="fw-bold">Admin Portal</h2>
-          <p className="text-muted" style={{ fontSize: '0.9rem' }}>MediConnect Administration Panel</p>
+    <div className="auth-page">
+      <div className="auth-card">
+        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+          <img src={assets.logo} alt="MediConnect" style={{ height: 40 }} />
         </div>
+        <h2>Admin Login</h2>
+        <p>Access the MediConnect admin panel</p>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="mb-3">
-            <label className="form-label fw-semibold">Admin Email</label>
-            <input
-              type="email"
-              className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-              placeholder="admin@mediconnect.com"
-              {...register('email', { required: 'Email is required', pattern: { value: /^\S+@\S+\.\S+$/, message: 'Invalid email' } })}
-            />
-            {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
+        {error && (
+          <div style={{ background: '#fee2e2', color: '#991b1b', padding: '10px 14px', borderRadius: 8, fontSize: '0.85rem', marginBottom: 16 }}>
+            {error}
           </div>
-          <div className="mb-4">
-            <label className="form-label fw-semibold">Password</label>
-            <input
-              type="password"
-              className={`form-control ${errors.password ? 'is-invalid' : ''}`}
-              placeholder="Enter admin password"
-              {...register('password', { required: 'Password is required' })}
-            />
-            {errors.password && <div className="invalid-feedback">{errors.password.message}</div>}
-          </div>
+        )}
 
-          <button type="submit" className="btn btn-primary w-100 py-2" disabled={loading}>
-            {loading ? (
-              <><span className="spinner-border spinner-border-sm me-2" />Authenticating...</>
-            ) : '🔐 Admin Login'}
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label className="form-label">Admin Email</label>
+            <input className="form-input" type="email" placeholder="admin@mediconnect.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+          </div>
+          <div className="form-group">
+            <label className="form-label">Password</label>
+            <input className="form-input" type="password" placeholder="Enter password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          </div>
+          <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: 8 }} disabled={loading}>
+            {loading ? 'Logging in...' : 'Admin Login'}
           </button>
         </form>
 
-        <div className="alert alert-warning mt-3 p-2" style={{ fontSize: '0.8rem' }}>
-          <strong>Demo:</strong> admin@mediconnect.com / admin123
+        <div className="demo-box" style={{ marginTop: 16 }}>
+          <strong>Demo Credentials:</strong>
+          admin@mediconnect.com / admin123
         </div>
 
-        <div className="text-center mt-3">
-          <a href="/auth/login" className="text-muted" style={{ fontSize: '0.85rem' }}>
-            ← Back to Patient/Doctor Login
-          </a>
+        <div style={{ textAlign: 'center', marginTop: 14 }}>
+          <Link to="/auth/login" style={{ fontSize: '0.85rem', color: '#6b7280' }}>← Back to Patient Login</Link>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
