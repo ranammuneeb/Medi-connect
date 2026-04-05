@@ -37,21 +37,23 @@ export default function DoctorAppointmentsPage() {
     <div className="doctor-layout">
       <DoctorSidebar />
       <div className="doctor-content">
-        <div style={{ marginBottom: 24 }}>
-          <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: 4 }}>My Appointments</h1>
-          <p style={{ color: '#6b7280', fontSize: '0.88rem' }}>{appointments.length} total appointments</p>
+        <div className="mb-4">
+          <h1 className="fw-bold mb-1" style={{ fontSize: '1.4rem' }}>My Appointments</h1>
+          <p className="text-muted" style={{ fontSize: '0.88rem' }}>{appointments.length} total appointments</p>
         </div>
 
         {/* Filters */}
-        <div style={{ display: 'flex', gap: 12, marginBottom: 20, flexWrap: 'wrap' }}>
+        <div className="d-flex gap-3 mb-3 flex-wrap">
           <input
-            style={{ padding: '9px 12px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.88rem', width: 260, outline: 'none' }}
+            className="form-control"
+            style={{ width: 260 }}
             placeholder="Search patient name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
           <select
-            style={{ padding: '9px 12px', border: '1px solid #e5e7eb', borderRadius: 8, fontSize: '0.88rem', outline: 'none' }}
+            className="form-select"
+            style={{ width: 'auto' }}
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
           >
@@ -61,49 +63,54 @@ export default function DoctorAppointmentsPage() {
         </div>
 
         {/* Table */}
-        <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
-            <thead>
-              <tr style={{ background: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                {['#', 'Patient', 'Date & Time', 'Fee', 'Payment', 'Status', 'Update'].map((h) => (
-                  <th key={h} style={{ padding: '12px 16px', textAlign: 'left', fontWeight: 600, color: '#6b7280', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <tr key={i}><td colSpan={7} style={{ padding: '12px 16px' }}><div className="skeleton" style={{ height: 20, borderRadius: 4 }} /></td></tr>
-                ))
-              ) : filtered.length === 0 ? (
-                <tr><td colSpan={7} style={{ padding: '40px', textAlign: 'center', color: '#6b7280' }}>No appointments found</td></tr>
-              ) : filtered.map((appt, i) => (
-                <tr key={appt.id} style={{ borderBottom: '1px solid #f3f4f6' }}>
-                  <td style={{ padding: '12px 16px', color: '#9ca3af' }}>{i + 1}</td>
-                  <td style={{ padding: '12px 16px', fontWeight: 500 }}>{appt.patientName}</td>
-                  <td style={{ padding: '12px 16px', color: '#6b7280' }}>{appt.date} · {appt.time}</td>
-                  <td style={{ padding: '12px 16px', fontWeight: 600, color: '#5f6fff' }}>${appt.fee}</td>
-                  <td style={{ padding: '12px 16px' }}>
-                    <span style={{ fontSize: '0.78rem', color: appt.paymentStatus === 'paid' ? '#10b981' : '#f59e0b', fontWeight: 500 }}>
-                      {appt.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
-                    </span>
-                  </td>
-                  <td style={{ padding: '12px 16px' }}>
-                    <span className={`status-badge ${statusClass[appt.status] || 'status-pending'}`}>{appt.status}</span>
-                  </td>
-                  <td style={{ padding: '12px 16px' }}>
-                    <select
-                      style={{ padding: '5px 8px', border: '1px solid #e5e7eb', borderRadius: 6, fontSize: '0.82rem', outline: 'none' }}
-                      value={appt.status}
-                      onChange={(e) => handleStatusChange(appt.id, e.target.value)}
-                    >
-                      {statusOptions.map((s) => <option key={s}>{s}</option>)}
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="card shadow-sm border-0">
+          <div className="card-body p-0">
+            <div className="table-responsive">
+              <table className="table table-bordered table-hover mb-0" style={{ fontSize: '0.88rem' }}>
+                <thead className="table-light">
+                  <tr>
+                    {['#', 'Patient', 'Date & Time', 'Fee', 'Payment', 'Status', 'Update'].map((h) => (
+                      <th key={h} style={{ fontWeight: 600, color: '#6b7280', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                      <tr key={i}><td colSpan={7}><div className="skeleton" style={{ height: 20, borderRadius: 4 }} /></td></tr>
+                    ))
+                  ) : filtered.length === 0 ? (
+                    <tr><td colSpan={7} className="text-center py-4 text-muted">No appointments found</td></tr>
+                  ) : filtered.map((appt, i) => (
+                    <tr key={appt.id}>
+                      <td className="text-muted">{i + 1}</td>
+                      <td className="fw-medium">{appt.patientName}</td>
+                      <td className="text-muted">{appt.date} · {appt.time}</td>
+                      <td className="fw-semibold" style={{ color: '#5f6fff' }}>${appt.fee}</td>
+                      <td>
+                        <span style={{ fontSize: '0.78rem', color: appt.paymentStatus === 'paid' ? '#10b981' : '#f59e0b', fontWeight: 500 }}>
+                          {appt.paymentStatus === 'paid' ? 'Paid' : 'Pending'}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`status-badge ${statusClass[appt.status] || 'status-pending'}`}>{appt.status}</span>
+                      </td>
+                      <td>
+                        <select
+                          className="form-select form-select-sm"
+                          style={{ fontSize: '0.82rem' }}
+                          value={appt.status}
+                          onChange={(e) => handleStatusChange(appt.id, e.target.value)}
+                        >
+                          {statusOptions.map((s) => <option key={s}>{s}</option>)}
+                        </select>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       </div>
     </div>

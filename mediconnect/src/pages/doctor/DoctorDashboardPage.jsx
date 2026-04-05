@@ -6,8 +6,6 @@ import { useAuth } from '../../context/AuthContext';
 
 const statusClass = { confirmed: 'status-confirmed', pending: 'status-pending', cancelled: 'status-cancelled', completed: 'status-completed' };
 
-const cardStyle = { background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, padding: 20 };
-
 export default function DoctorDashboardPage() {
   const { user } = useAuth();
   const today = new Date().toISOString().split('T')[0];
@@ -36,74 +34,88 @@ export default function DoctorDashboardPage() {
     <div className="doctor-layout">
       <DoctorSidebar />
       <div className="doctor-content">
-        <div style={{ marginBottom: 28 }}>
-          <h1 style={{ fontSize: '1.4rem', fontWeight: 700, marginBottom: 4 }}>Dashboard</h1>
-          <p style={{ color: '#6b7280', fontSize: '0.88rem' }}>
+        <div className="mb-4">
+          <h1 className="fw-bold mb-1" style={{ fontSize: '1.4rem' }}>Dashboard</h1>
+          <p className="text-muted" style={{ fontSize: '0.88rem' }}>
             Welcome back, {user?.name} · {new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
           </p>
         </div>
 
         {/* Stats */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+        <div className="row g-3 mb-4">
           {stats.map((s) => (
-            <div key={s.label} style={{ ...cardStyle, display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 48, height: 48, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 }}>
-                {s.icon}
-              </div>
-              <div>
-                <div style={{ fontSize: '1.4rem', fontWeight: 800, color: s.color }}>{s.value}</div>
-                <div style={{ fontSize: '0.78rem', color: '#6b7280' }}>{s.label}</div>
+            <div key={s.label} className="col-6 col-xl-3">
+              <div className="card shadow-sm border-0 h-100">
+                <div className="card-body d-flex align-items-center gap-3">
+                  <div style={{ width: 48, height: 48, borderRadius: 10, background: s.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 }}>
+                    {s.icon}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: s.color }}>{s.value}</div>
+                    <div className="text-muted" style={{ fontSize: '0.78rem' }}>{s.label}</div>
+                  </div>
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+        <div className="row g-3 mb-3">
           {/* Today */}
-          <div style={cardStyle}>
-            <h3 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 16 }}>Today's Appointments</h3>
-            {todayAppts.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '24px 0', color: '#9ca3af' }}>No appointments today</div>
-            ) : todayAppts.map((appt) => (
-              <div key={appt.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#f9fafb', borderRadius: 8, marginBottom: 8, fontSize: '0.88rem' }}>
-                <div>
-                  <div style={{ fontWeight: 600 }}>{appt.patientName}</div>
-                  <div style={{ color: '#6b7280', fontSize: '0.8rem' }}>{appt.time}</div>
-                </div>
-                <span className={`status-badge ${statusClass[appt.status] || 'status-pending'}`}>{appt.status}</span>
+          <div className="col-12 col-lg-6">
+            <div className="card shadow-sm border-0">
+              <div className="card-body">
+                <h3 className="fw-semibold mb-3" style={{ fontSize: '0.95rem' }}>Today's Appointments</h3>
+                {todayAppts.length === 0 ? (
+                  <div className="text-center py-4 text-muted">No appointments today</div>
+                ) : todayAppts.map((appt) => (
+                  <div key={appt.id} className="d-flex justify-content-between align-items-center p-2 rounded mb-2" style={{ background: '#f9fafb', fontSize: '0.88rem' }}>
+                    <div>
+                      <div className="fw-semibold">{appt.patientName}</div>
+                      <div className="text-muted" style={{ fontSize: '0.8rem' }}>{appt.time}</div>
+                    </div>
+                    <span className={`status-badge ${statusClass[appt.status] || 'status-pending'}`}>{appt.status}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
 
           {/* Upcoming */}
-          <div style={cardStyle}>
-            <h3 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 16 }}>Upcoming Appointments</h3>
-            {upcomingAppts.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: '24px 0', color: '#9ca3af' }}>No upcoming appointments</div>
-            ) : upcomingAppts.slice(0, 5).map((appt) => (
-              <div key={appt.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#f9fafb', borderRadius: 8, marginBottom: 8, fontSize: '0.88rem' }}>
-                <div>
-                  <div style={{ fontWeight: 600 }}>{appt.patientName}</div>
-                  <div style={{ color: '#6b7280', fontSize: '0.8rem' }}>{appt.date} · {appt.time}</div>
-                </div>
-                <span className={`status-badge ${statusClass[appt.status] || 'status-pending'}`}>{appt.status}</span>
+          <div className="col-12 col-lg-6">
+            <div className="card shadow-sm border-0">
+              <div className="card-body">
+                <h3 className="fw-semibold mb-3" style={{ fontSize: '0.95rem' }}>Upcoming Appointments</h3>
+                {upcomingAppts.length === 0 ? (
+                  <div className="text-center py-4 text-muted">No upcoming appointments</div>
+                ) : upcomingAppts.slice(0, 5).map((appt) => (
+                  <div key={appt.id} className="d-flex justify-content-between align-items-center p-2 rounded mb-2" style={{ background: '#f9fafb', fontSize: '0.88rem' }}>
+                    <div>
+                      <div className="fw-semibold">{appt.patientName}</div>
+                      <div className="text-muted" style={{ fontSize: '0.8rem' }}>{appt.date} · {appt.time}</div>
+                    </div>
+                    <span className={`status-badge ${statusClass[appt.status] || 'status-pending'}`}>{appt.status}</span>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
           </div>
         </div>
 
         {/* Chart */}
-        <div style={cardStyle}>
-          <h3 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 16 }}>Weekly Appointment Volume</h3>
-          <ResponsiveContainer width="100%" height={200}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-              <XAxis dataKey="day" tick={{ fontSize: 12 }} />
-              <YAxis tick={{ fontSize: 12 }} />
-              <Tooltip />
-              <Bar dataKey="count" fill="#5f6fff" radius={[6, 6, 0, 0]} name="Appointments" />
-            </BarChart>
-          </ResponsiveContainer>
+        <div className="card shadow-sm border-0">
+          <div className="card-body">
+            <h3 className="fw-semibold mb-3" style={{ fontSize: '0.95rem' }}>Weekly Appointment Volume</h3>
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                <XAxis dataKey="day" tick={{ fontSize: 12 }} />
+                <YAxis tick={{ fontSize: 12 }} />
+                <Tooltip />
+                <Bar dataKey="count" fill="#5f6fff" radius={[6, 6, 0, 0]} name="Appointments" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       </div>
     </div>

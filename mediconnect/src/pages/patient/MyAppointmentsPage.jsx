@@ -54,20 +54,20 @@ export default function MyAppointmentsPage() {
     <div>
       <PatientNavbar />
 
-      <div style={{ padding: '32px 40px', maxWidth: 860, margin: '0 auto' }}>
-        <h2 style={{ fontWeight: 700, fontSize: '1.3rem', marginBottom: 4 }}>My appointments</h2>
-        <p style={{ color: '#6b7280', fontSize: '0.88rem', marginBottom: 28 }}>
+      <div className="px-4 py-4" style={{ maxWidth: 860, margin: '0 auto' }}>
+        <h2 className="fw-bold mb-1" style={{ fontSize: '1.3rem' }}>My appointments</h2>
+        <p className="text-muted mb-4" style={{ fontSize: '0.88rem' }}>
           {appointments.length} appointment{appointments.length !== 1 ? 's' : ''}
         </p>
 
         {loading ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: '#6b7280' }}>
+          <div className="text-center py-5 text-muted">
             Loading...
           </div>
         ) : appointments.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: '#6b7280' }}>
+          <div className="text-center py-5 text-muted">
             <div style={{ fontSize: '3rem', marginBottom: 12 }}>📭</div>
-            <h3 style={{ marginBottom: 8 }}>No appointments yet</h3>
+            <h3 className="mb-2">No appointments yet</h3>
             <p>Book your first appointment with a trusted doctor.</p>
           </div>
         ) : (
@@ -79,37 +79,45 @@ export default function MyAppointmentsPage() {
               <div key={appt.id} className="appt-card">
                 {/* Doctor image */}
                 {docImage ? (
-                  <img src={docImage} alt={appt.doctorName} className="appt-doctor-img" />
+                  <img src={docImage} alt={appt.doctorName} style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', background: '#eef0ff', flexShrink: 0 }} />
                 ) : (
-                  <div className="appt-doctor-img" style={{ background: '#eef0ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem' }}>
+                  <div style={{ width: 56, height: 56, borderRadius: 8, background: '#eef0ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 }}>
                     👨‍⚕️
                   </div>
                 )}
 
                 {/* Info */}
-                <div className="appt-info">
-                  <div className="appt-name">{appt.doctorName}</div>
-                  <div className="appt-meta">{appt.specialty}</div>
-                  <div className="appt-meta" style={{ marginTop: 4 }}>
-                    <strong>Date & Time:</strong> {appt.date}, {appt.time}
+                <div style={{ flex: 1 }}>
+                  <div className="fw-semibold" style={{ fontSize: '0.95rem', marginBottom: 3 }}>{appt.doctorName}</div>
+                  <div className="text-muted" style={{ fontSize: '0.82rem' }}>{appt.specialty}</div>
+                  <div className="text-muted mt-1" style={{ fontSize: '0.82rem' }}>
+                    <strong>Date &amp; Time:</strong> {appt.date}, {appt.time}
                   </div>
-                  <div className="appt-meta" style={{ marginTop: 4 }}>
+                  <div className="text-muted mt-1" style={{ fontSize: '0.82rem' }}>
                     <strong>Address:</strong> 17th Cross, Richmond Circle, Ring Road, London
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="appt-actions">
+                <div className="d-flex flex-column gap-2 align-items-end">
                   <span className={`status-badge ${statusClass[appt.status] || 'status-pending'}`}>
                     {appt.status}
                   </span>
                   {isUpcoming && (
-                    <button className="btn-cancel" onClick={() => handleCancel(appt.id)}>
+                    <button
+                      className="btn btn-sm rounded-pill"
+                      style={{ border: '1px solid #e5e7eb', background: '#fff', color: '#2d3748', fontSize: '0.82rem' }}
+                      onClick={() => handleCancel(appt.id)}
+                    >
                       Cancel appointment
                     </button>
                   )}
                   {appt.paymentStatus !== 'paid' && appt.status !== 'cancelled' && (
-                    <button className="btn-pay" onClick={() => alert('Payment flow coming soon')}>
+                    <button
+                      className="btn btn-sm rounded-pill"
+                      style={{ background: '#5f6fff', color: '#fff', border: 'none', fontSize: '0.82rem' }}
+                      onClick={() => alert('Payment flow coming soon')}
+                    >
                       Pay online
                     </button>
                   )}

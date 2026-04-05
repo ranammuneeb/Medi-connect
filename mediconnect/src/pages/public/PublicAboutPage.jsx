@@ -6,8 +6,8 @@ export default function PublicAboutPage() {
     <div>
       <LandingNavbar />
 
-      <div className="section">
-        <p className="section-title" style={{ textAlign: 'center' }}>
+      <div className="py-5 px-4">
+        <p className="h4 fw-bold text-center">
           ABOUT <span style={{ color: '#5f6fff' }}>US</span>
         </p>
 
@@ -39,7 +39,7 @@ export default function PublicAboutPage() {
         </div>
       </div>
 
-      <div className="section" style={{ background: '#f9fafb' }}>
+      <div className="py-5 px-4" style={{ background: '#f9fafb' }}>
         <p style={{ fontWeight: 700, fontSize: '1rem', color: '#2d3748', marginBottom: 24, letterSpacing: 1 }}>
           WHY <span style={{ color: '#5f6fff' }}>CHOOSE US</span>
         </p>

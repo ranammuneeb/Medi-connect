@@ -19,7 +19,7 @@ export default function DoctorSidebar() {
   return (
     <div className="doctor-sidebar">
       <div className="sidebar-brand">MediConnect</div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '0 24px 16px', borderBottom: '1px solid #e5e7eb', marginBottom: 8 }}>
+      <div className="d-flex align-items-center gap-2 px-4 pb-3" style={{ borderBottom: '1px solid #e5e7eb', marginBottom: 8 }}>
         <img
           src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'Dr')}&background=5f6fff&color=fff`}
           alt="avatar"
@@ -45,7 +45,8 @@ export default function DoctorSidebar() {
       <div style={{ position: 'absolute', bottom: 24, left: 0, right: 0, padding: '0 24px' }}>
         <button
           onClick={handleLogout}
-          style={{ width: '100%', padding: '9px', border: '1px solid #e5e7eb', borderRadius: 8, background: '#fff', color: '#6b7280', cursor: 'pointer', fontSize: '0.88rem', fontWeight: 500 }}
+          className="btn btn-outline-secondary w-100"
+          style={{ borderRadius: 8, fontSize: '0.88rem', fontWeight: 500 }}
         >
           Logout
         </button>

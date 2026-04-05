@@ -1,4 +1,4 @@
-/* ─── Prescripto Design System ───────────────────────────────────────────── */
+/* ─── Design System Variables ─────────────────────────────────────────────── */
 :root {
   --primary: #5f6fff;
   --primary-dark: #4a58e0;
@@ -14,12 +14,6 @@
   --warning: #f59e0b;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   color: var(--text-dark);
@@ -27,97 +21,7 @@ body {
   line-height: 1.6;
 }
 
-/* ─── Navbar ──────────────────────────────────────────────────────────────── */
-.navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 40px;
-  height: 72px;
-  background: #fff;
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-.navbar-brand {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1.4rem;
-  font-weight: 800;
-  color: var(--primary);
-  text-decoration: none;
-}
-.navbar-links {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  list-style: none;
-}
-.navbar-links a {
-  text-decoration: none;
-  color: var(--text-gray);
-  font-size: 0.95rem;
-  font-weight: 500;
-  transition: color 0.2s;
-  position: relative;
-  padding-bottom: 4px;
-}
-.navbar-links a:hover,
-.navbar-links a.active {
-  color: var(--primary);
-}
-.navbar-links a.active::after {
-  content: '';
-  position: absolute;
-  bottom: -4px;
-  left: 0; right: 0;
-  height: 2px;
-  background: var(--primary);
-  border-radius: 2px;
-}
-.navbar-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.btn-primary {
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: 50px;
-  padding: 10px 24px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s, transform 0.1s;
-  text-decoration: none;
-  display: inline-block;
-}
-.btn-primary:hover {
-  background: var(--primary-dark);
-  transform: translateY(-1px);
-  color: #fff;
-}
-.btn-outline {
-  background: transparent;
-  color: var(--primary);
-  border: 1.5px solid var(--primary);
-  border-radius: 50px;
-  padding: 9px 22px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-decoration: none;
-  display: inline-block;
-}
-.btn-outline:hover {
-  background: var(--primary-light);
-}
-
-/* Avatar dropdown */
+/* ─── Avatar dropdown (React-state driven, not Bootstrap JS) ──────────────── */
 .avatar-menu {
   position: relative;
 }
@@ -178,7 +82,7 @@ body {
   margin: 4px 0;
 }
 
-/* Mobile menu */
+/* ─── Mobile nav overlay ──────────────────────────────────────────────────── */
 .menu-icon-btn {
   display: none;
   background: none;
@@ -216,12 +120,10 @@ body {
 }
 
 @media (max-width: 768px) {
-  .navbar { padding: 0 20px; }
-  .navbar-links, .navbar-right .btn-primary { display: none; }
   .menu-icon-btn { display: block; }
 }
 
-/* ─── Hero Section (logged-in) ────────────────────────────────────────────── */
+/* ─── Hero Section (logged-in patient) ───────────────────────────────────── */
 .hero {
   background: linear-gradient(135deg, #eef0ff 0%, #e8f4ff 100%);
   padding: 60px 40px;
@@ -323,27 +225,23 @@ body {
   display: block;
 }
 
-/* ─── Speciality Section ──────────────────────────────────────────────────── */
-.section { padding: 60px 40px; }
-.section-title {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--text-dark);
-  margin-bottom: 8px;
-}
-.section-subtitle {
-  color: var(--text-gray);
-  font-size: 0.95rem;
-  margin-bottom: 36px;
-  max-width: 480px;
-}
+/* ─── Speciality Grid ────────────────────────────────────────────────────── */
 .speciality-grid {
-  display: flex;
-  gap: 16px;
+  display: flex !important;
   flex-wrap: wrap;
   justify-content: center;
+  gap: 16px;
   padding-bottom: 8px;
 }
+
+/* ─── Doctors Grid ────────────────────────────────────────────────────────── */
+.doctors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+/* ─── Speciality Cards ────────────────────────────────────────────────────── */
 .speciality-card {
   flex-shrink: 0;
   display: flex;
@@ -373,11 +271,6 @@ body {
 }
 
 /* ─── Doctor Cards ────────────────────────────────────────────────────────── */
-.doctors-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-}
 .doctor-card {
   background: #fff;
   border: 1px solid var(--border);
@@ -463,22 +356,6 @@ body {
   font-weight: 600;
 }
 .listing-content { flex: 1; padding: 24px; }
-.listing-search {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-.listing-search input {
-  flex: 1;
-  padding: 10px 16px;
-  border: 1px solid var(--border);
-  border-radius: 50px;
-  font-size: 0.9rem;
-  outline: none;
-  transition: border-color 0.2s;
-}
-.listing-search input:focus { border-color: var(--primary); }
 
 /* ─── Doctor Profile Page ─────────────────────────────────────────────────── */
 .profile-page { padding: 40px; max-width: 1000px; margin: 0 auto; }
@@ -506,10 +383,7 @@ body {
   gap: 8px;
   margin-bottom: 6px;
 }
-.verified-badge {
-  width: 22px;
-  height: 22px;
-}
+.verified-badge { width: 22px; height: 22px; }
 .profile-degree {
   font-size: 0.9rem;
   color: var(--text-gray);
@@ -524,6 +398,7 @@ body {
   font-weight: 500;
   color: var(--text-dark);
   margin-bottom: 16px;
+  margin-left: 10px;
 }
 .profile-about h3 {
   font-size: 1rem;
@@ -543,8 +418,7 @@ body {
 }
 .fee-row strong { color: var(--text-dark); }
 
-/* ─── Booking Page ────────────────────────────────────────────────────────── */
-.booking-page { padding: 40px; max-width: 900px; margin: 0 auto; }
+/* ─── Booking Slots ───────────────────────────────────────────────────────── */
 .slot-section h3 {
   font-size: 1rem;
   font-weight: 600;
@@ -601,123 +475,7 @@ body {
   margin-bottom: 28px;
 }
 
-/* ─── Appointments Page ───────────────────────────────────────────────────── */
-.appt-tabs {
-  display: flex;
-  gap: 0;
-  margin-bottom: 24px;
-  border-bottom: 1px solid var(--border);
-}
-.appt-tab {
-  padding: 12px 24px;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: var(--text-gray);
-  background: none;
-  border: none;
-  border-bottom: 2px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s;
-  margin-bottom: -1px;
-}
-.appt-tab:hover { color: var(--primary); }
-.appt-tab.active {
-  color: var(--primary);
-  border-bottom-color: var(--primary);
-  font-weight: 600;
-}
-.appt-card {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 20px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: #fff;
-  margin-bottom: 12px;
-}
-.appt-doctor-img {
-  width: 56px;
-  height: 56px;
-  border-radius: 8px;
-  object-fit: cover;
-  background: var(--primary-light);
-  flex-shrink: 0;
-}
-.appt-info { flex: 1; }
-.appt-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 3px; }
-.appt-meta { font-size: 0.82rem; color: var(--text-gray); }
-.appt-actions { display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
-.btn-cancel {
-  padding: 7px 18px;
-  border: 1px solid var(--border);
-  border-radius: 50px;
-  background: #fff;
-  font-size: 0.82rem;
-  font-weight: 500;
-  cursor: pointer;
-  color: var(--text-dark);
-  transition: all 0.2s;
-}
-.btn-cancel:hover { border-color: var(--danger); color: var(--danger); }
-.btn-pay {
-  padding: 7px 18px;
-  border: none;
-  border-radius: 50px;
-  background: var(--primary);
-  color: #fff;
-  font-size: 0.82rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-.btn-pay:hover { background: var(--primary-dark); }
-
-/* ─── Status Badges ───────────────────────────────────────────────────────── */
-.status-badge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 50px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: capitalize;
-}
-.status-confirmed { background: #d1fae5; color: #065f46; }
-.status-pending   { background: #fef3c7; color: #92400e; }
-.status-cancelled { background: #fee2e2; color: #991b1b; }
-.status-completed { background: #dbeafe; color: #1e40af; }
-
-/* ─── Profile Form Page ───────────────────────────────────────────────────── */
-.profile-form-page { padding: 40px; max-width: 800px; margin: 0 auto; }
-.form-group { margin-bottom: 16px; }
-.form-label {
-  display: block;
-  font-size: 0.82rem;
-  font-weight: 500;
-  color: var(--text-gray);
-  margin-bottom: 6px;
-}
-.form-input {
-  width: 100%;
-  padding: 10px 14px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font-size: 0.9rem;
-  color: var(--text-dark);
-  outline: none;
-  transition: border-color 0.2s;
-  background: #fff;
-}
-.form-input:focus { border-color: var(--primary); }
-.form-input.error { border-color: var(--danger); }
-.form-error { font-size: 0.78rem; color: var(--danger); margin-top: 4px; }
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-/* ─── Auth Page ───────────────────────────────────────────────────────────── */
+/* ─── Auth Pages ──────────────────────────────────────────────────────────── */
 .auth-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #eef0ff 0%, #e8f4ff 100%);
@@ -838,6 +596,32 @@ body {
   background: var(--bg);
 }
 
+/* ─── Appointment Cards ───────────────────────────────────────────────────── */
+.appt-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  margin-bottom: 12px;
+}
+
+/* ─── Status Badges ───────────────────────────────────────────────────────── */
+.status-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+.status-confirmed { background: #d1fae5; color: #065f46; }
+.status-pending   { background: #fef3c7; color: #92400e; }
+.status-cancelled { background: #fee2e2; color: #991b1b; }
+.status-completed { background: #dbeafe; color: #1e40af; }
+
 /* ─── Footer ──────────────────────────────────────────────────────────────── */
 .footer {
   background: var(--text-dark);
@@ -866,7 +650,7 @@ body {
   font-weight: 600;
   margin-bottom: 14px;
 }
-.footer-col ul { list-style: none; }
+.footer-col ul { list-style: none; padding: 0; }
 .footer-col ul li { margin-bottom: 8px; }
 .footer-col ul li a {
   font-size: 0.85rem;
@@ -899,15 +683,13 @@ body {
 @media (max-width: 768px) {
   .hero { flex-direction: column; padding: 40px 20px; min-height: auto; }
   .hero-image { display: none; }
-  .section { padding: 40px 20px; }
   .profile-top { flex-direction: column; }
   .profile-img { width: 160px; height: 160px; }
-  .form-row { grid-template-columns: 1fr; }
   .footer-grid { grid-template-columns: 1fr; }
   .footer { padding: 40px 20px 20px; }
   .listing-layout { flex-direction: column; }
   .listing-sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
   .admin-sidebar, .doctor-sidebar { display: none; }
   .admin-content, .doctor-content { margin-left: 0; }
-  .booking-page, .profile-page, .profile-form-page { padding: 20px; }
+  .profile-page { padding: 20px; }
 }

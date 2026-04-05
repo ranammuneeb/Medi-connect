@@ -66,7 +66,7 @@ export default function LoginRegisterPage() {
     <div className="auth-page">
       <div className="auth-card">
         {/* Logo */}
-        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+        <div className="text-center mb-4">
           <img src={assets.logo} alt="MediConnect" style={{ height: 40 }} />
         </div>
 
@@ -80,7 +80,7 @@ export default function LoginRegisterPage() {
         </div>
 
         {/* Patient / Doctor role toggle */}
-        <div style={{ display: 'flex', gap: 10, marginBottom: 20 }}>
+        <div className="d-flex gap-2 mb-3">
           <button
             onClick={() => switchRole('patient')}
             style={{
@@ -118,46 +118,46 @@ export default function LoginRegisterPage() {
         </div>
 
         {error && (
-          <div style={{ background: '#fee2e2', color: '#991b1b', padding: '10px 14px', borderRadius: 8, fontSize: '0.85rem', marginBottom: 16 }}>
+          <div className="alert alert-danger py-2 px-3 mb-3" style={{ fontSize: '0.85rem' }}>
             {error}
           </div>
         )}
 
         {activeTab === 'Login' ? (
           <form onSubmit={handleLogin}>
-            <div className="form-group">
+            <div className="mb-3">
               <label className="form-label">Email</label>
-              <input className="form-input" type="email" placeholder="m@example.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
+              <input className="form-control" type="email" placeholder="m@example.com" value={loginEmail} onChange={(e) => setLoginEmail(e.target.value)} />
             </div>
-            <div className="form-group">
+            <div className="mb-3">
               <label className="form-label">Password</label>
-              <input className="form-input" type="password" placeholder="Enter your password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
+              <input className="form-control" type="password" placeholder="Enter your password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
             </div>
-            <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: 8 }} disabled={loading}>
+            <button type="submit" className="btn w-100 rounded-pill mt-1" style={{ background: '#5f6fff', color: '#fff', border: 'none' }} disabled={loading}>
               {loading ? 'Logging in...' : `Login as ${role === 'patient' ? 'Patient' : 'Doctor'}`}
             </button>
           </form>
         ) : (
           <form onSubmit={handleRegister}>
-            <div className="form-group">
+            <div className="mb-3">
               <label className="form-label">Full Name</label>
-              <input className="form-input" type="text" placeholder="Enter your name" value={regName} onChange={(e) => setRegName(e.target.value)} />
+              <input className="form-control" type="text" placeholder="Enter your name" value={regName} onChange={(e) => setRegName(e.target.value)} />
             </div>
-            <div className="form-group">
+            <div className="mb-3">
               <label className="form-label">Email</label>
-              <input className="form-input" type="email" placeholder="m@example.com" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} />
+              <input className="form-control" type="email" placeholder="m@example.com" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} />
             </div>
-            <div className="form-group">
+            <div className="mb-3">
               <label className="form-label">Password</label>
-              <input className="form-input" type="password" placeholder="Min 6 characters" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} />
+              <input className="form-control" type="password" placeholder="Min 6 characters" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} />
             </div>
-            <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: 8 }} disabled={loading}>
+            <button type="submit" className="btn w-100 rounded-pill mt-1" style={{ background: '#5f6fff', color: '#fff', border: 'none' }} disabled={loading}>
               {loading ? 'Creating account...' : `Sign up as ${role === 'patient' ? 'Patient' : 'Doctor'}`}
             </button>
           </form>
         )}
 
-        <div style={{ textAlign: 'center', marginTop: 16, fontSize: '0.85rem', color: '#6b7280' }}>
+        <div className="text-center mt-3" style={{ fontSize: '0.85rem', color: '#6b7280' }}>
           {activeTab === 'Login' ? (
             <>Don't have an account?{' '}
               <span style={{ color: '#5f6fff', cursor: 'pointer', fontWeight: 600 }} onClick={() => switchTab('Register')}>Sign up</span>
@@ -169,7 +169,7 @@ export default function LoginRegisterPage() {
           )}
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: 10 }}>
+        <div className="text-center mt-2">
           <Link to="/admin/login" style={{ fontSize: '0.8rem', color: '#9ca3af' }}>Admin login →</Link>
         </div>
 

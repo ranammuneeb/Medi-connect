@@ -27,9 +27,9 @@ export default function PatientProfilePage() {
     <div>
       <PatientNavbar />
 
-      <div className="profile-form-page">
+      <div className="px-4 py-4" style={{ maxWidth: 800, margin: '0 auto' }}>
         {/* Avatar + name */}
-        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20, marginBottom: 32 }}>
+        <div className="d-flex align-items-end gap-3 mb-4">
           <div style={{ position: 'relative' }}>
             <img
               src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=5f6fff&color=fff&size=128`}
@@ -50,37 +50,37 @@ export default function PatientProfilePage() {
           <div>
             {isEdit ? (
               <input
-                className="form-input"
-                style={{ fontSize: '1.2rem', fontWeight: 700, border: 'none', borderBottom: '2px solid #5f6fff', borderRadius: 0, padding: '4px 0', width: 240 }}
+                className="form-control"
+                style={{ fontSize: '1.2rem', fontWeight: 700, border: 'none', borderBottom: '2px solid #5f6fff', borderRadius: 0, padding: '4px 0', width: 240, boxShadow: 'none' }}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             ) : (
-              <h2 style={{ fontWeight: 700, fontSize: '1.4rem' }}>{name}</h2>
+              <h2 className="fw-bold" style={{ fontSize: '1.4rem' }}>{name}</h2>
             )}
           </div>
         </div>
 
-        <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', marginBottom: 24 }} />
+        <hr className="mb-4" />
 
         {/* Contact info */}
-        <h3 style={{ fontSize: '0.95rem', color: '#6b7280', fontWeight: 600, marginBottom: 16 }}>CONTACT INFORMATION</h3>
+        <h3 className="text-muted fw-semibold mb-3" style={{ fontSize: '0.95rem' }}>CONTACT INFORMATION</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: '12px 0', marginBottom: 32, fontSize: '0.9rem' }}>
-          <span style={{ color: '#6b7280', fontWeight: 500 }}>Email id:</span>
+          <span className="text-muted fw-medium">Email id:</span>
           <span style={{ color: '#5f6fff' }}>{user?.email}</span>
 
-          <span style={{ color: '#6b7280', fontWeight: 500 }}>Phone:</span>
+          <span className="text-muted fw-medium">Phone:</span>
           {isEdit ? (
-            <input className="form-input" style={{ padding: '6px 10px', maxWidth: 260 }} value={phone} onChange={(e) => setPhone(e.target.value)} />
+            <input className="form-control" style={{ padding: '6px 10px', maxWidth: 260 }} value={phone} onChange={(e) => setPhone(e.target.value)} />
           ) : (
             <span style={{ color: '#374151' }}>{phone || '—'}</span>
           )}
 
-          <span style={{ color: '#6b7280', fontWeight: 500 }}>Address:</span>
+          <span className="text-muted fw-medium">Address:</span>
           {isEdit ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <input className="form-input" style={{ padding: '6px 10px', maxWidth: 320 }} placeholder="Line 1" value={address1} onChange={(e) => setAddress1(e.target.value)} />
-              <input className="form-input" style={{ padding: '6px 10px', maxWidth: 320 }} placeholder="Line 2" value={address2} onChange={(e) => setAddress2(e.target.value)} />
+            <div className="d-flex flex-column gap-2">
+              <input className="form-control" style={{ padding: '6px 10px', maxWidth: 320 }} placeholder="Line 1" value={address1} onChange={(e) => setAddress1(e.target.value)} />
+              <input className="form-control" style={{ padding: '6px 10px', maxWidth: 320 }} placeholder="Line 2" value={address2} onChange={(e) => setAddress2(e.target.value)} />
             </div>
           ) : (
             <span style={{ color: '#374151' }}>
@@ -89,14 +89,14 @@ export default function PatientProfilePage() {
           )}
         </div>
 
-        <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', marginBottom: 24 }} />
+        <hr className="mb-4" />
 
         {/* Basic info */}
-        <h3 style={{ fontSize: '0.95rem', color: '#6b7280', fontWeight: 600, marginBottom: 16 }}>BASIC INFORMATION</h3>
+        <h3 className="text-muted fw-semibold mb-3" style={{ fontSize: '0.95rem' }}>BASIC INFORMATION</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: '12px 0', fontSize: '0.9rem', marginBottom: 32 }}>
-          <span style={{ color: '#6b7280', fontWeight: 500 }}>Gender:</span>
+          <span className="text-muted fw-medium">Gender:</span>
           {isEdit ? (
-            <select className="form-input" style={{ padding: '6px 10px', maxWidth: 200 }} value={gender} onChange={(e) => setGender(e.target.value)}>
+            <select className="form-select" style={{ padding: '6px 10px', maxWidth: 200 }} value={gender} onChange={(e) => setGender(e.target.value)}>
               <option>Not Selected</option>
               <option>Male</option>
               <option>Female</option>
@@ -106,9 +106,9 @@ export default function PatientProfilePage() {
             <span style={{ color: '#374151' }}>{gender}</span>
           )}
 
-          <span style={{ color: '#6b7280', fontWeight: 500 }}>Birthday:</span>
+          <span className="text-muted fw-medium">Birthday:</span>
           {isEdit ? (
-            <input type="date" className="form-input" style={{ padding: '6px 10px', maxWidth: 200 }} value={dob} onChange={(e) => setDob(e.target.value)} />
+            <input type="date" className="form-control" style={{ padding: '6px 10px', maxWidth: 200 }} value={dob} onChange={(e) => setDob(e.target.value)} />
           ) : (
             <span style={{ color: '#374151' }}>{dob || '—'}</span>
           )}
@@ -116,16 +116,16 @@ export default function PatientProfilePage() {
 
         {/* Actions */}
         {isEdit ? (
-          <div style={{ display: 'flex', gap: 12 }}>
-            <button className="btn-outline" onClick={() => setIsEdit(false)} style={{ borderRadius: 8, padding: '8px 24px' }}>
+          <div className="d-flex gap-3">
+            <button className="btn btn-outline-primary rounded" style={{ borderColor: '#5f6fff', color: '#5f6fff', padding: '8px 24px' }} onClick={() => setIsEdit(false)}>
               Cancel
             </button>
-            <button className="btn-primary" onClick={handleSave} disabled={saving} style={{ borderRadius: 8, padding: '8px 24px' }}>
+            <button className="btn rounded" style={{ background: '#5f6fff', color: '#fff', border: 'none', padding: '8px 24px' }} onClick={handleSave} disabled={saving}>
               {saving ? 'Saving...' : 'Save information'}
             </button>
           </div>
         ) : (
-          <button className="btn-outline" onClick={() => setIsEdit(true)} style={{ borderRadius: 8, padding: '8px 24px' }}>
+          <button className="btn btn-outline-primary rounded" style={{ borderColor: '#5f6fff', color: '#5f6fff', padding: '8px 24px' }} onClick={() => setIsEdit(true)}>
             Edit
           </button>
         )}

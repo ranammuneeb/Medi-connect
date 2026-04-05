@@ -32,7 +32,7 @@ export default function DoctorListingPage() {
     <div>
       {user ? <PatientNavbar /> : <LandingNavbar />}
 
-      <div style={{ padding: '24px 40px', color: '#6b7280', fontSize: '0.9rem' }}>
+      <div className="px-4 py-3" style={{ color: '#6b7280', fontSize: '0.9rem' }}>
         <span style={{ cursor: 'pointer' }} onClick={() => navigate(user ? '/patient/home' : '/landing')}>Home</span>
         {' / '}
         <span>Doctors</span>
@@ -65,15 +65,15 @@ export default function DoctorListingPage() {
 
         {/* Doctor grid */}
         <div className="listing-content">
-          <p style={{ color: '#6b7280', marginBottom: 20, fontSize: '0.9rem' }}>
+          <p className="text-muted mb-4" style={{ fontSize: '0.9rem' }}>
             {filteredDoctors.length} doctor{filteredDoctors.length !== 1 ? 's' : ''} found
             {selectedSpeciality ? ` for "${selectedSpeciality}"` : ''}
           </p>
 
           {filteredDoctors.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: '60px 0', color: '#6b7280' }}>
+            <div className="text-center py-5 text-muted">
               <div style={{ fontSize: '3rem', marginBottom: 12 }}>🔍</div>
-              <h3 style={{ marginBottom: 8 }}>No doctors found</h3>
+              <h3 className="mb-2">No doctors found</h3>
               <p>Try selecting a different speciality</p>
             </div>
           ) : (

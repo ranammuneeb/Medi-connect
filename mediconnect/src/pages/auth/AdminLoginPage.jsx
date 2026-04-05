@@ -31,38 +31,38 @@ export default function AdminLoginPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        <div style={{ textAlign: 'center', marginBottom: 20 }}>
+        <div className="text-center mb-4">
           <img src={assets.logo} alt="MediConnect" style={{ height: 40 }} />
         </div>
         <h2>Admin Login</h2>
         <p>Access the MediConnect admin panel</p>
 
         {error && (
-          <div style={{ background: '#fee2e2', color: '#991b1b', padding: '10px 14px', borderRadius: 8, fontSize: '0.85rem', marginBottom: 16 }}>
+          <div className="alert alert-danger py-2 px-3 mb-3" style={{ fontSize: '0.85rem' }}>
             {error}
           </div>
         )}
 
         <form onSubmit={handleSubmit}>
-          <div className="form-group">
+          <div className="mb-3">
             <label className="form-label">Admin Email</label>
-            <input className="form-input" type="email" placeholder="admin@mediconnect.com" value={email} onChange={(e) => setEmail(e.target.value)} />
+            <input className="form-control" type="email" placeholder="admin@mediconnect.com" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
-          <div className="form-group">
+          <div className="mb-3">
             <label className="form-label">Password</label>
-            <input className="form-input" type="password" placeholder="Enter password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <input className="form-control" type="password" placeholder="Enter password" value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
-          <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: 8 }} disabled={loading}>
+          <button type="submit" className="btn w-100 rounded-pill mt-1" style={{ background: '#5f6fff', color: '#fff', border: 'none' }} disabled={loading}>
             {loading ? 'Logging in...' : 'Admin Login'}
           </button>
         </form>
 
-        <div className="demo-box" style={{ marginTop: 16 }}>
+        <div className="demo-box mt-3">
           <strong>Demo Credentials:</strong>
           admin@mediconnect.com / admin123
         </div>
 
-        <div style={{ textAlign: 'center', marginTop: 14 }}>
+        <div className="text-center mt-3">
           <Link to="/auth/login" style={{ fontSize: '0.85rem', color: '#6b7280' }}>← Back to Patient Login</Link>
         </div>
       </div>

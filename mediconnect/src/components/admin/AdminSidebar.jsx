@@ -34,7 +34,8 @@ export default function AdminSidebar() {
       <div style={{ position: 'absolute', bottom: 24, left: 0, right: 0, padding: '0 24px' }}>
         <button
           onClick={handleLogout}
-          style={{ width: '100%', padding: '9px', border: '1px solid #e5e7eb', borderRadius: 8, background: '#fff', color: '#6b7280', cursor: 'pointer', fontSize: '0.88rem', fontWeight: 500 }}
+          className="btn btn-outline-secondary w-100"
+          style={{ borderRadius: 8, fontSize: '0.88rem', fontWeight: 500 }}
         >
           Logout
         </button>

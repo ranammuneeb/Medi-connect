@@ -28,7 +28,7 @@ export default function HomePage() {
             Simply browse through our extensive list of trusted doctors,
             schedule your appointment hassle-free.
           </p>
-          <a href="#speciality" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <a href="#speciality" className="btn rounded-pill" style={{ background: '#5f6fff', color: '#fff', border: 'none', display: 'inline-flex', alignItems: 'center', gap: 8 }}>
             Book appointment
             <img src={assets.arrow_icon} alt="" style={{ width: 16 }} />
           </a>
@@ -39,9 +39,9 @@ export default function HomePage() {
       </div>
 
       {/* ── Speciality ────────────────────────────────────────────────────── */}
-      <div className="section" id="speciality" style={{ textAlign: 'center' }}>
-        <p className="section-title">Find by Speciality</p>
-        <p className="section-subtitle" style={{ margin: '0 auto 36px' }}>
+      <div className="py-5 px-4 text-center" id="speciality">
+        <p className="h4 fw-bold">Find by Speciality</p>
+        <p className="text-muted mx-auto mb-4" style={{ maxWidth: 480 }}>
           Simply browse through our extensive list of trusted doctors, schedule
           your appointment hassle-free.
         </p>
@@ -60,9 +60,9 @@ export default function HomePage() {
       </div>
 
       {/* ── Top Doctors ───────────────────────────────────────────────────── */}
-      <div className="section" style={{ background: '#f9fafb', textAlign: 'center' }}>
-        <p className="section-title">Top Doctors to Book</p>
-        <p className="section-subtitle" style={{ margin: '0 auto 36px' }}>
+      <div className="py-5 px-4 text-center" style={{ background: '#f9fafb' }}>
+        <p className="h4 fw-bold">Top Doctors to Book</p>
+        <p className="text-muted mx-auto mb-4" style={{ maxWidth: 480 }}>
           Simply browse through our extensive list of trusted doctors.
         </p>
         <div className="doctors-grid">
@@ -85,8 +85,8 @@ export default function HomePage() {
             </div>
           ))}
         </div>
-        <div style={{ textAlign: 'center', marginTop: 32 }}>
-          <button className="btn-outline" onClick={() => navigate('/patient/doctors')}>
+        <div className="text-center mt-4">
+          <button className="btn btn-outline-primary rounded-pill" style={{ borderColor: '#5f6fff', color: '#5f6fff' }} onClick={() => navigate('/patient/doctors')}>
             more
           </button>
         </div>
@@ -109,8 +109,8 @@ export default function HomePage() {
             Book Appointment<br />With 100+ Trusted Doctors on MediConnect
           </h2>
           <button
-            className="btn-primary"
-            style={{ background: '#fff', color: '#5f6fff' }}
+            className="btn rounded-pill"
+            style={{ background: '#fff', color: '#5f6fff', border: 'none' }}
             onClick={() => navigate('/patient/doctors')}
           >
             Create account

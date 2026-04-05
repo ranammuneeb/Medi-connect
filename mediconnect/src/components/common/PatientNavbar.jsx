@@ -19,21 +19,28 @@ export default function PatientNavbar() {
 
   return (
     <>
-      <nav className="navbar">
+      <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+        <div className="container">
         {/* Brand */}
         <Link to="/patient/home" className="navbar-brand">
           <img src={assets.logo} alt="MediConnect" style={{ height: 36 }} />
         </Link>
 
-        {/* Nav Links */}
-        <ul className="navbar-links">
-          <li><Link to="/patient/home" className={isActive('/patient/home') ? 'active' : ''}>HOME</Link></li>
-          <li><Link to="/patient/doctors" className={isActive('/patient/doctors') ? 'active' : ''}>ALL DOCTORS</Link></li>
-          <li><Link to="/patient/appointments" className={isActive('/patient/appointments') ? 'active' : ''}>MY APPOINTMENTS</Link></li>
+        {/* Nav Links — centered */}
+        <ul className="navbar-nav mx-auto d-none d-lg-flex flex-row gap-4">
+          <li className="nav-item">
+            <Link to="/patient/home" className={`nav-link${isActive('/patient/home') ? ' active fw-semibold' : ''}`} style={isActive('/patient/home') ? { color: '#5f6fff' } : {}}>HOME</Link>
+          </li>
+          <li className="nav-item">
+            <Link to="/patient/doctors" className={`nav-link${isActive('/patient/doctors') ? ' active fw-semibold' : ''}`} style={isActive('/patient/doctors') ? { color: '#5f6fff' } : {}}>ALL DOCTORS</Link>
+          </li>
+          <li className="nav-item">
+            <Link to="/patient/appointments" className={`nav-link${isActive('/patient/appointments') ? ' active fw-semibold' : ''}`} style={isActive('/patient/appointments') ? { color: '#5f6fff' } : {}}>MY APPOINTMENTS</Link>
+          </li>
         </ul>
 
         {/* Right side */}
-        <div className="navbar-right">
+        <div className="d-flex align-items-center gap-2">
           {user ? (
             <div className="avatar-menu">
               <button
@@ -50,7 +57,7 @@ export default function PatientNavbar() {
                 </svg>
               </button>
               {dropdownOpen && (
-                <div className="dropdown-menu">
+                <div className="dropdown-menu show">
                   <Link to="/patient/profile" onClick={() => setDropdownOpen(false)}>My Profile</Link>
                   <Link to="/patient/appointments" onClick={() => setDropdownOpen(false)}>My Appointments</Link>
                   <div className="dropdown-divider" />
@@ -59,13 +66,14 @@ export default function PatientNavbar() {
               )}
             </div>
           ) : (
-            <Link to="/auth/login" className="btn-primary">Create account</Link>
+            <Link to="/auth/login" className="btn rounded-pill" style={{ background: '#5f6fff', color: '#fff', border: 'none' }}>Create account</Link>
           )}
 
           {/* Mobile hamburger */}
-          <button className="menu-icon-btn" onClick={() => setMobileOpen(true)}>
+          <button className="menu-icon-btn d-lg-none" onClick={() => setMobileOpen(true)}>
             <img src={assets.menu_icon} alt="menu" style={{ width: 24 }} />
           </button>
+        </div>
         </div>
       </nav>
 

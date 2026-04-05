@@ -10,26 +10,36 @@ export default function LandingNavbar() {
 
   return (
     <>
-      <nav className="navbar">
-        {/* Brand */}
-        <Link to="/landing" className="navbar-brand">
-          <img src={assets.logo} alt="MediConnect" style={{ height: 36 }} />
-        </Link>
+      <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
+        <div className="container">
+          {/* Brand */}
+          <Link to="/landing" className="navbar-brand">
+            <img src={assets.logo} alt="MediConnect" style={{ height: 36 }} />
+          </Link>
 
-        {/* Nav Links */}
-        <ul className="navbar-links">
-          <li><Link to="/landing" className={isActive('/landing') ? 'active' : ''}>HOME</Link></li>
-          <li><Link to="/all-doctors" className={location.pathname.startsWith('/all-doctors') ? 'active' : ''}>ALL DOCTORS</Link></li>
-          <li><Link to="/about" className={isActive('/about') ? 'active' : ''}>ABOUT</Link></li>
-          <li><Link to="/contact" className={isActive('/contact') ? 'active' : ''}>CONTACT</Link></li>
-        </ul>
+          {/* Nav Links — centered */}
+          <ul className="navbar-nav mx-auto d-none d-lg-flex flex-row gap-4">
+            <li className="nav-item">
+              <Link to="/landing" className={`nav-link${isActive('/landing') ? ' active fw-semibold' : ''}`} style={isActive('/landing') ? { color: '#5f6fff' } : {}}>HOME</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/all-doctors" className={`nav-link${location.pathname.startsWith('/all-doctors') ? ' active fw-semibold' : ''}`} style={location.pathname.startsWith('/all-doctors') ? { color: '#5f6fff' } : {}}>ALL DOCTORS</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/about" className={`nav-link${isActive('/about') ? ' active fw-semibold' : ''}`} style={isActive('/about') ? { color: '#5f6fff' } : {}}>ABOUT</Link>
+            </li>
+            <li className="nav-item">
+              <Link to="/contact" className={`nav-link${isActive('/contact') ? ' active fw-semibold' : ''}`} style={isActive('/contact') ? { color: '#5f6fff' } : {}}>CONTACT</Link>
+            </li>
+          </ul>
 
-        {/* Right side */}
-        <div className="navbar-right">
-          <Link to="/auth/login" className="btn-primary">Create account</Link>
-          <button className="menu-icon-btn" onClick={() => setMobileOpen(true)}>
-            <img src={assets.menu_icon} alt="menu" style={{ width: 24 }} />
-          </button>
+          {/* Right side */}
+          <div className="d-flex align-items-center gap-2">
+            <Link to="/auth/login" className="btn rounded-pill d-none d-lg-inline-block" style={{ background: '#5f6fff', color: '#fff', border: 'none' }}>Create account</Link>
+            <button className="menu-icon-btn d-lg-none" onClick={() => setMobileOpen(true)}>
+              <img src={assets.menu_icon} alt="menu" style={{ width: 24 }} />
+            </button>
+          </div>
         </div>
       </nav>
 

@@ -6,8 +6,8 @@ export default function PublicContactPage() {
     <div>
       <LandingNavbar />
 
-      <div className="section">
-        <p className="section-title" style={{ textAlign: 'center' }}>
+      <div className="py-5 px-4">
+        <p className="h4 fw-bold text-center">
           CONTACT <span style={{ color: '#5f6fff' }}>US</span>
         </p>
 
@@ -30,7 +30,7 @@ export default function PublicContactPage() {
             <p style={{ color: '#4b5563', lineHeight: 1.8, marginBottom: 20 }}>
               Learn more about our teams and job openings.
             </p>
-            <button className="btn-outline">Explore Jobs</button>
+            <button className="btn btn-outline-primary rounded-pill" style={{ borderColor: '#5f6fff', color: '#5f6fff' }}>Explore Jobs</button>
           </div>
         </div>
       </div>
