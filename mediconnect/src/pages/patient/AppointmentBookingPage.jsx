@@ -1,230 +1,183 @@
-import { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { useForm } from 'react-hook-form';
-import DatePicker from 'react-datepicker';
-import { motion } from 'framer-motion';
-import { format, addDays, isBefore, startOfDay } from 'date-fns';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from 'react';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import PatientNavbar from '../../components/common/PatientNavbar';
-import { doctorsAPI, appointmentsAPI } from '../../services/api';
+import { doctors, assets } from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
+import { appointmentsAPI } from '../../services/api';
 
-const dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+function getNextDays() {
+  const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+  const days = [];
+  let d = new Date();
+  d.setDate(d.getDate() + 1);
+  while (days.length < 7) {
+    if (d.getDay() !== 0) {
+      days.push({
+        label: dayNames[d.getDay()],
+        date: d.getDate(),
+        fullDate: d.toISOString().split('T')[0],
+      });
+    }
+    d.setDate(d.getDate() + 1);
+  }
+  return days;
+}
+
+const TIME_SLOTS = [
+  '8:00 am', '8:30 am', '9:00 am', '9:30 am', '10:00 am', '10:30 am',
+  '11:00 am', '11:30 am', '1:00 pm', '1:30 pm', '2:00 pm', '2:30 pm',
+  '3:00 pm', '3:30 pm', '4:00 pm', '4:30 pm',
+];
 
 export default function AppointmentBookingPage() {
   const { doctorId } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [selectedDate, setSelectedDate] = useState(null);
-  const [selectedSlot, setSelectedSlot] = useState('');
 
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    defaultValues: {
-      name: user?.name || '',
-      email: user?.email || '',
-      phone: user?.phone || '',
-    },
-  });
+  const days = getNextDays();
+  const preselectedTime = searchParams.get('time') || '';
+  const preselectedDate = searchParams.get('date') || '';
+  const preselectedDayIdx = preselectedDate
+    ? days.findIndex((d) => d.fullDate === preselectedDate)
+    : 0;
 
-  const { data: doctor } = useQuery({
-    queryKey: ['doctor', doctorId],
-    queryFn: () => doctorsAPI.getById(doctorId),
-  });
+  const [doctor, setDoctor] = useState(null);
+  const [selectedDay, setSelectedDay] = useState(preselectedDayIdx >= 0 ? preselectedDayIdx : 0);
+  const [selectedTime, setSelectedTime] = useState(preselectedTime);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const formattedDate = selectedDate ? format(selectedDate, 'yyyy-MM-dd') : '';
-  const dayName = selectedDate ? dayNames[selectedDate.getDay()] : '';
-  const availableSlots = doctor?.availability?.[dayName] || [];
+  useEffect(() => {
+    const doc = doctors.find((d) => d._id === doctorId);
+    setDoctor(doc || null);
+  }, [doctorId]);
 
-  const { data: bookedSlots = [] } = useQuery({
-    queryKey: ['bookedSlots', doctorId, formattedDate],
-    queryFn: () => appointmentsAPI.getBookedSlots(doctorId, formattedDate),
-    enabled: !!(doctorId && formattedDate),
-  });
-
-  const { mutate: bookAppointment, isPending } = useMutation({
-    mutationFn: (data) =>
-      appointmentsAPI.book({
+  const handleBook = async () => {
+    if (!selectedTime) { setError('Please select a time slot'); return; }
+    setError('');
+    setLoading(true);
+    try {
+      const appointment = await appointmentsAPI.book({
         patientId: user.id,
-        patientName: data.name,
-        patientEmail: data.email,
-        patientPhone: data.phone,
-        symptoms: data.symptoms,
-        doctorId: Number(doctorId),
-        doctorName: doctor?.name,
-        specialty: doctor?.specialty,
-        date: formattedDate,
-        time: selectedSlot,
-        fee: doctor?.consultationFee,
-      }),
-    onSuccess: (appointment) => {
-      toast.success('Appointment booked! Redirecting to payment...');
+        patientName: user.name,
+        patientEmail: user.email,
+        doctorId: doctorId,
+        doctorName: doctor.name,
+        specialty: doctor.speciality,
+        date: days[selectedDay].fullDate,
+        time: selectedTime,
+        fee: doctor.fees,
+      });
       navigate(`/patient/payment/${appointment.id}`);
-    },
-    onError: (err) => toast.error(err.message || 'Booking failed'),
-  });
-
-  const onSubmit = (data) => {
-    if (!selectedDate) { toast.error('Please select a date'); return; }
-    if (!selectedSlot) { toast.error('Please select a time slot'); return; }
-    bookAppointment(data);
+    } catch (err) {
+      setError(err.message || 'Booking failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (!doctor) {
+    return (
+      <div>
+        <PatientNavbar />
+        <div style={{ padding: '60px 40px', textAlign: 'center', color: '#6b7280' }}>
+          <h2>Doctor not found</h2>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
       <PatientNavbar />
+      <div className="booking-page">
 
-      <div style={{ background: 'linear-gradient(135deg, #0d6efd 0%, #0dcaf0 100%)', padding: '30px 0' }}>
-        <div className="container">
-          <h1 style={{ color: '#fff', fontWeight: 800, fontSize: '1.8rem', marginBottom: 4 }}>
-            📅 Book Appointment
-          </h1>
-          <p style={{ color: 'rgba(255,255,255,0.8)', marginBottom: 0 }}>
-            with {doctor?.name || '...'}
-          </p>
-        </div>
-      </div>
-
-      <div className="container py-4">
-        <div className="row g-4">
-          {/* Doctor Summary */}
-          {doctor && (
-            <div className="col-md-4">
-              <div className="card p-4 text-center sticky-top" style={{ top: 80 }}>
-                <img src={doctor.avatar} alt={doctor.name} className="rounded-circle mx-auto mb-3"
-                  style={{ width: 90, height: 90, objectFit: 'cover', border: '3px solid #e0f2fe' }} />
-                <span className="specialty-chip mb-2">{doctor.specialty}</span>
-                <h5 className="fw-bold mt-2">{doctor.name}</h5>
-                <p className="text-muted" style={{ fontSize: '0.88rem' }}>📍 {doctor.location}</p>
-                <div className="d-flex justify-content-center gap-3 mt-2">
-                  <div className="text-center">
-                    <div className="fw-bold text-primary">{doctor.experience}+</div>
-                    <small className="text-muted">Yrs Exp</small>
-                  </div>
-                  <div className="text-center">
-                    <div className="fw-bold text-primary">⭐ {doctor.rating}</div>
-                    <small className="text-muted">Rating</small>
-                  </div>
-                  <div className="text-center">
-                    <div className="fw-bold text-primary">${doctor.consultationFee}</div>
-                    <small className="text-muted">Fee</small>
-                  </div>
-                </div>
-              </div>
+        {/* Doctor info row */}
+        <div style={{
+          display: 'flex',
+          gap: 20,
+          alignItems: 'center',
+          padding: 24,
+          border: '1px solid #e5e7eb',
+          borderRadius: 12,
+          marginBottom: 32,
+          background: '#fff',
+        }}>
+          <img
+            src={doctor.image}
+            alt={doctor.name}
+            style={{ width: 100, height: 100, borderRadius: 10, objectFit: 'cover', background: '#eef0ff', flexShrink: 0 }}
+          />
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+              <span style={{ fontWeight: 700, fontSize: '1.1rem' }}>{doctor.name}</span>
+              <img src={assets.verified_icon} alt="verified" style={{ width: 18 }} />
             </div>
-          )}
-
-          {/* Booking Form */}
-          <div className="col-md-8">
-            <motion.form
-              onSubmit={handleSubmit(onSubmit)}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              {/* Step 1: Date */}
-              <div className="card p-4 mb-4">
-                <h5 className="fw-bold mb-3">📅 Step 1: Select Date</h5>
-                <DatePicker
-                  selected={selectedDate}
-                  onChange={(date) => { setSelectedDate(date); setSelectedSlot(''); }}
-                  minDate={addDays(new Date(), 1)}
-                  placeholderText="Choose appointment date"
-                  dateFormat="MMMM d, yyyy"
-                  filterDate={(date) => date.getDay() !== 0} // No Sundays
-                  inline
-                />
-              </div>
-
-              {/* Step 2: Time Slot */}
-              {selectedDate && (
-                <div className="card p-4 mb-4">
-                  <h5 className="fw-bold mb-3">🕐 Step 2: Select Time Slot ({dayName})</h5>
-                  {availableSlots.length === 0 ? (
-                    <div className="alert alert-warning">
-                      No available slots for {dayName}. Please select another date.
-                    </div>
-                  ) : (
-                    <div className="d-flex flex-wrap">
-                      {availableSlots.map((slot) => {
-                        const isBooked = bookedSlots.includes(slot);
-                        return (
-                          <button
-                            key={slot}
-                            type="button"
-                            disabled={isBooked}
-                            className={`time-slot-btn ${selectedSlot === slot ? 'selected' : ''}`}
-                            onClick={() => setSelectedSlot(slot)}
-                          >
-                            {isBooked ? `${slot} (booked)` : slot}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-
-              {/* Step 3: Patient Details */}
-              <div className="card p-4 mb-4">
-                <h5 className="fw-bold mb-3">👤 Step 3: Your Details</h5>
-                <div className="row g-3">
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Full Name *</label>
-                    <input className={`form-control ${errors.name ? 'is-invalid' : ''}`}
-                      {...register('name', { required: 'Name is required' })} />
-                    {errors.name && <div className="invalid-feedback">{errors.name.message}</div>}
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Email *</label>
-                    <input type="email" className={`form-control ${errors.email ? 'is-invalid' : ''}`}
-                      {...register('email', { required: 'Email is required', pattern: { value: /^\S+@\S+\.\S+$/, message: 'Invalid email' } })} />
-                    {errors.email && <div className="invalid-feedback">{errors.email.message}</div>}
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Phone Number *</label>
-                    <input className={`form-control ${errors.phone ? 'is-invalid' : ''}`}
-                      {...register('phone', { required: 'Phone is required' })} />
-                    {errors.phone && <div className="invalid-feedback">{errors.phone.message}</div>}
-                  </div>
-                  <div className="col-md-6">
-                    <label className="form-label fw-semibold">Appointment Summary</label>
-                    <div className="form-control bg-light" style={{ fontSize: '0.88rem' }}>
-                      {selectedDate && selectedSlot
-                        ? `${format(selectedDate, 'MMM d, yyyy')} at ${selectedSlot}`
-                        : 'Select date & time above'}
-                    </div>
-                  </div>
-                  <div className="col-12">
-                    <label className="form-label fw-semibold">Symptoms / Notes</label>
-                    <textarea className="form-control" rows={3} placeholder="Briefly describe your symptoms or reason for visit..."
-                      {...register('symptoms')} />
-                  </div>
-                </div>
-              </div>
-
-              {/* Summary & Submit */}
-              {selectedDate && selectedSlot && (
-                <div className="card p-4 mb-4" style={{ border: '2px solid #0d6efd' }}>
-                  <h6 className="fw-bold mb-3">📋 Appointment Summary</h6>
-                  <div className="row g-2" style={{ fontSize: '0.9rem' }}>
-                    <div className="col-6"><span className="text-muted">Doctor:</span> <strong>{doctor?.name}</strong></div>
-                    <div className="col-6"><span className="text-muted">Specialty:</span> <strong>{doctor?.specialty}</strong></div>
-                    <div className="col-6"><span className="text-muted">Date:</span> <strong>{format(selectedDate, 'MMM d, yyyy')}</strong></div>
-                    <div className="col-6"><span className="text-muted">Time:</span> <strong>{selectedSlot}</strong></div>
-                    <div className="col-6"><span className="text-muted">Consultation Fee:</span> <strong className="text-primary">${doctor?.consultationFee}</strong></div>
-                  </div>
-                </div>
-              )}
-
-              <button type="submit" className="btn btn-primary w-100 py-3" disabled={isPending} style={{ fontSize: '1.1rem' }}>
-                {isPending ? (
-                  <><span className="spinner-border spinner-border-sm me-2" />Booking...</>
-                ) : '💳 Proceed to Payment'}
-              </button>
-            </motion.form>
+            <div style={{ color: '#6b7280', fontSize: '0.88rem', marginBottom: 8 }}>
+              {doctor.degree} – {doctor.speciality} &nbsp;
+              <span style={{ border: '1px solid #e5e7eb', borderRadius: 4, padding: '2px 8px', fontSize: '0.78rem', color: '#374151' }}>
+                {doctor.experience}
+              </span>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              <img src={assets.info_icon} alt="" style={{ width: 14 }} />
+              <span style={{ color: '#374151', fontSize: '0.85rem', fontWeight: 500 }}>About</span>
+            </div>
+            <p style={{ color: '#6b7280', fontSize: '0.82rem', marginTop: 6, maxWidth: 520, lineHeight: 1.6 }}>
+              {doctor.about}
+            </p>
+            <div style={{ marginTop: 8, fontSize: '0.88rem', color: '#374151' }}>
+              Appointment fee: <strong style={{ color: '#5f6fff' }}>${doctor.fees}</strong>
+            </div>
           </div>
         </div>
+
+        {/* Slot selector */}
+        <div className="slot-section">
+          <h3>Booking slots</h3>
+
+          <div className="day-slots">
+            {days.map((day, i) => (
+              <button
+                key={day.fullDate}
+                className={`day-btn ${selectedDay === i ? 'selected' : ''}`}
+                onClick={() => { setSelectedDay(i); setSelectedTime(''); }}
+              >
+                <div style={{ fontSize: '0.72rem' }}>{day.label}</div>
+                <div style={{ fontSize: '1rem', fontWeight: 700 }}>{day.date}</div>
+              </button>
+            ))}
+          </div>
+
+          <div className="time-slots">
+            {TIME_SLOTS.map((slot) => (
+              <button
+                key={slot}
+                className={`time-btn ${selectedTime === slot ? 'selected' : ''}`}
+                onClick={() => setSelectedTime(slot)}
+              >
+                {slot}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {error && (
+          <div style={{ background: '#fee2e2', color: '#991b1b', padding: '10px 14px', borderRadius: 8, fontSize: '0.85rem', marginBottom: 16 }}>
+            {error}
+          </div>
+        )}
+
+        {selectedTime && (
+          <div style={{ background: '#eef0ff', borderRadius: 10, padding: '14px 20px', marginBottom: 20, fontSize: '0.88rem', color: '#374151' }}>
+            <strong>Selected:</strong> {days[selectedDay].label} {days[selectedDay].date} &nbsp;|&nbsp; {selectedTime} &nbsp;|&nbsp; Fee: ${doctor.fees}
+          </div>
+        )}
+
+        <button className="btn-primary" onClick={handleBook} disabled={loading}>
+          {loading ? 'Booking...' : 'Book an appointment'}
+        </button>
       </div>
     </div>
   );

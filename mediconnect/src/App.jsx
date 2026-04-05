@@ -6,6 +6,11 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 import LoginRegisterPage from './pages/auth/LoginRegisterPage';
 import AdminLoginPage from './pages/auth/AdminLoginPage';
 
+// Public Pages
+import LandingPage from './pages/public/LandingPage';
+import PublicAboutPage from './pages/public/PublicAboutPage';
+import PublicContactPage from './pages/public/PublicContactPage';
+
 // Patient Pages
 import HomePage from './pages/patient/HomePage';
 import DoctorListingPage from './pages/patient/DoctorListingPage';
@@ -27,7 +32,7 @@ import DoctorProfileManagePage from './pages/doctor/DoctorProfileManagePage';
 
 function RootRedirect() {
   const { user } = useAuth();
-  if (!user) return <Navigate to="/auth/login" replace />;
+  if (!user) return <Navigate to="/landing" replace />;
   if (user.role === 'admin') return <Navigate to="/admin/dashboard" replace />;
   if (user.role === 'doctor') return <Navigate to="/doctor/dashboard" replace />;
   return <Navigate to="/patient/home" replace />;
@@ -39,12 +44,19 @@ export default function App() {
       {/* Root */}
       <Route path="/" element={<RootRedirect />} />
 
+      {/* Public routes (no login required) */}
+      <Route path="/landing" element={<LandingPage />} />
+      <Route path="/about" element={<PublicAboutPage />} />
+      <Route path="/contact" element={<PublicContactPage />} />
+      <Route path="/all-doctors" element={<DoctorListingPage />} />
+      <Route path="/all-doctors/:id" element={<DoctorProfilePage />} />
+
       {/* Auth */}
       <Route path="/auth/login" element={<LoginRegisterPage />} />
       <Route path="/auth/register" element={<LoginRegisterPage />} />
       <Route path="/admin/login" element={<AdminLoginPage />} />
 
-      {/* Patient Routes */}
+      {/* Patient Routes (login required) */}
       <Route path="/patient/*" element={
         <ProtectedRoute allowedRoles={['patient']}>
           <Routes>

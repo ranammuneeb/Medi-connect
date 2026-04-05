@@ -1,18 +1,17 @@
 import { useNavigate } from 'react-router-dom';
-import PatientNavbar from '../../components/common/PatientNavbar';
+import LandingNavbar from '../../components/common/LandingNavbar';
 import { assets, specialityData, doctors } from '../../assets/assets';
 
-export default function HomePage() {
+export default function LandingPage() {
   const navigate = useNavigate();
-
   const topDoctors = doctors.slice(0, 10);
 
   return (
     <div>
-      <PatientNavbar />
+      <LandingNavbar />
 
       {/* ── Hero ─────────────────────────────────────────────────────────── */}
-      <div className="hero">
+      <div className="hero-landing">
         <div className="hero-text">
           <div className="hero-badges">
             <div className="hero-badge">
@@ -22,13 +21,13 @@ export default function HomePage() {
           </div>
           <h1>
             Book Appointment<br />
-            With <span>Trusted Doctors</span>
+            With Trusted Doctors
           </h1>
           <p>
             Simply browse through our extensive list of trusted doctors,
             schedule your appointment hassle-free.
           </p>
-          <a href="#speciality" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <a href="#speciality" className="btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#fff', color: '#5f6fff' }}>
             Book appointment
             <img src={assets.arrow_icon} alt="" style={{ width: 16 }} />
           </a>
@@ -50,7 +49,7 @@ export default function HomePage() {
             <div
               key={item.speciality}
               className="speciality-card"
-              onClick={() => navigate(`/patient/doctors?speciality=${item.speciality}`)}
+              onClick={() => navigate(`/auth/login`)}
             >
               <img src={item.image} alt={item.speciality} />
               <span>{item.speciality}</span>
@@ -70,13 +69,9 @@ export default function HomePage() {
             <div
               key={doc._id}
               className="doctor-card"
-              onClick={() => navigate(`/patient/doctors/${doc._id}`)}
+              onClick={() => navigate('/auth/login')}
             >
-              <img
-                src={doc.image}
-                alt={doc.name}
-                className="doctor-card-img"
-              />
+              <img src={doc.image} alt={doc.name} className="doctor-card-img" />
               <div className="doctor-card-body">
                 <div className="available-dot">Available</div>
                 <div className="doctor-card-name">{doc.name}</div>
@@ -86,7 +81,7 @@ export default function HomePage() {
           ))}
         </div>
         <div style={{ textAlign: 'center', marginTop: 32 }}>
-          <button className="btn-outline" onClick={() => navigate('/patient/doctors')}>
+          <button className="btn-outline" onClick={() => navigate('/all-doctors')}>
             more
           </button>
         </div>
@@ -111,7 +106,7 @@ export default function HomePage() {
           <button
             className="btn-primary"
             style={{ background: '#fff', color: '#5f6fff' }}
-            onClick={() => navigate('/patient/doctors')}
+            onClick={() => navigate('/auth/login')}
           >
             Create account
           </button>
@@ -128,11 +123,7 @@ export default function HomePage() {
         <div className="footer-grid">
           <div>
             <div className="footer-brand">
-              <img
-                src={assets.logo}
-                alt="MediConnect"
-                style={{ height: 44, width:300, display: 'block' }}
-              />
+              <img src={assets.logo} alt="MediConnect" style={{ height: 44, width: 300, display: 'block' }} />
             </div>
             <p className="footer-desc">
               Your trusted platform for booking appointments with top doctors.
@@ -142,9 +133,9 @@ export default function HomePage() {
           <div className="footer-col">
             <h4>COMPANY</h4>
             <ul>
-              <li><a href="#">Home</a></li>
-              <li><a href="#">About us</a></li>
-              <li><a href="#">All Doctors</a></li>
+              <li><a href="/landing">Home</a></li>
+              <li><a href="/about">About us</a></li>
+              <li><a href="/all-doctors">All Doctors</a></li>
               <li><a href="#">Privacy policy</a></li>
             </ul>
           </div>

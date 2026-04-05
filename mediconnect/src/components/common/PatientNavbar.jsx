@@ -1,53 +1,94 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { Navbar, Nav, Container, Button, Dropdown } from 'react-bootstrap';
+import { useState } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import toast from 'react-hot-toast';
+import { assets } from '../../assets/assets';
 
 export default function PatientNavbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleLogout = () => {
     logout();
-    toast.success('Logged out successfully');
     navigate('/auth/login');
   };
 
+  const isActive = (path) => location.pathname === path;
+
   return (
-    <Navbar className="navbar-custom" expand="lg" sticky="top">
-      <Container>
-        <Navbar.Brand as={Link} to="/patient/home">
-          🏥 MediConnect
-        </Navbar.Brand>
-        <Navbar.Toggle aria-controls="main-nav" />
-        <Navbar.Collapse id="main-nav">
-          <Nav className="me-auto gap-1">
-            <Nav.Link as={Link} to="/patient/home">Home</Nav.Link>
-            <Nav.Link as={Link} to="/patient/doctors">Find Doctors</Nav.Link>
-            <Nav.Link as={Link} to="/patient/appointments">My Appointments</Nav.Link>
-          </Nav>
-          <Nav className="align-items-center gap-2">
-            <Dropdown align="end">
-              <Dropdown.Toggle variant="light" className="d-flex align-items-center gap-2 border-0 bg-transparent">
+    <>
+      <nav className="navbar">
+        {/* Brand */}
+        <Link to="/patient/home" className="navbar-brand">
+          <img src={assets.logo} alt="MediConnect" style={{ height: 36 }} />
+        </Link>
+
+        {/* Nav Links */}
+        <ul className="navbar-links">
+          <li><Link to="/patient/home" className={isActive('/patient/home') ? 'active' : ''}>HOME</Link></li>
+          <li><Link to="/patient/doctors" className={isActive('/patient/doctors') ? 'active' : ''}>ALL DOCTORS</Link></li>
+          <li><Link to="/patient/appointments" className={isActive('/patient/appointments') ? 'active' : ''}>MY APPOINTMENTS</Link></li>
+        </ul>
+
+        {/* Right side */}
+        <div className="navbar-right">
+          {user ? (
+            <div className="avatar-menu">
+              <button
+                className="avatar-trigger"
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+              >
                 <img
-                  src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}`}
-                  alt="avatar"
-                  className="avatar-circle"
+                  src={user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'U')}&background=5f6fff&color=fff`}
+                  alt={user.name}
+                  className="avatar-img"
                 />
-                <span className="fw-semibold d-none d-md-inline">{user?.name}</span>
-              </Dropdown.Toggle>
-              <Dropdown.Menu>
-                <Dropdown.Item as={Link} to="/patient/profile">My Profile</Dropdown.Item>
-                <Dropdown.Item as={Link} to="/patient/appointments">Appointments</Dropdown.Item>
-                <Dropdown.Divider />
-                <Dropdown.Item onClick={handleLogout} className="text-danger">
-                  Logout
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown>
-          </Nav>
-        </Navbar.Collapse>
-      </Container>
-    </Navbar>
+                <svg className={`dropdown-arrow ${dropdownOpen ? 'open' : ''}`} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </button>
+              {dropdownOpen && (
+                <div className="dropdown-menu">
+                  <Link to="/patient/profile" onClick={() => setDropdownOpen(false)}>My Profile</Link>
+                  <Link to="/patient/appointments" onClick={() => setDropdownOpen(false)}>My Appointments</Link>
+                  <div className="dropdown-divider" />
+                  <button className="logout-btn" onClick={handleLogout}>Logout</button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <Link to="/auth/login" className="btn-primary">Create account</Link>
+          )}
+
+          {/* Mobile hamburger */}
+          <button className="menu-icon-btn" onClick={() => setMobileOpen(true)}>
+            <img src={assets.menu_icon} alt="menu" style={{ width: 24 }} />
+          </button>
+        </div>
+      </nav>
+
+      {/* Mobile nav */}
+      {mobileOpen && (
+        <div className="mobile-nav open">
+          <button className="mobile-nav-close" onClick={() => setMobileOpen(false)}>
+            <img src={assets.cross_icon} alt="close" style={{ width: 20 }} />
+          </button>
+          <Link to="/patient/home" onClick={() => setMobileOpen(false)}>HOME</Link>
+          <Link to="/patient/doctors" onClick={() => setMobileOpen(false)}>ALL DOCTORS</Link>
+          <Link to="/patient/appointments" onClick={() => setMobileOpen(false)}>MY APPOINTMENTS</Link>
+          {user ? (
+            <>
+              <Link to="/patient/profile" onClick={() => setMobileOpen(false)}>My Profile</Link>
+              <Link to="/patient/appointments" onClick={() => setMobileOpen(false)}>My Appointments</Link>
+              <button style={{ padding: '12px 0', background: 'none', border: 'none', color: '#ef4444', fontSize: '1rem', cursor: 'pointer', textAlign: 'left', borderBottom: '1px solid #e5e7eb' }} onClick={() => { setMobileOpen(false); handleLogout(); }}>Logout</button>
+            </>
+          ) : (
+            <Link to="/auth/login" onClick={() => setMobileOpen(false)}>Create account</Link>
+          )}
+        </div>
+      )}
+    </>
   );
 }
