@@ -57,7 +57,7 @@ export default function DoctorProfilePage() {
     return (
       <div>
         <Navbar />
-        <div style={{ padding: '60px 40px', textAlign: 'center', color: '#6b7280' }}>
+        <div className="text-center py-5 text-muted">
           <h2>Doctor not found</h2>
         </div>
       </div>
@@ -126,7 +126,8 @@ export default function DoctorProfilePage() {
           </div>
 
           <button
-            className="btn-primary"
+            className="btn rounded-pill"
+            style={{ background: '#5f6fff', color: '#fff', border: 'none' }}
             onClick={() => {
               if (!user) { navigate('/auth/login'); return; }
               if (!selectedTime) { alert('Please select a time slot'); return; }
@@ -140,8 +141,8 @@ export default function DoctorProfilePage() {
         {/* Related doctors */}
         {relatedDoctors.length > 0 && (
           <div>
-            <p className="section-title" style={{ fontSize: '1.2rem' }}>Related Doctors</p>
-            <p style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: 20 }}>
+            <p className="h5 fw-bold mb-2">Related Doctors</p>
+            <p className="text-muted mb-4" style={{ fontSize: '0.9rem' }}>
               Simply browse through our extensive list of trusted doctors.
             </p>
             <div className="doctors-grid">
