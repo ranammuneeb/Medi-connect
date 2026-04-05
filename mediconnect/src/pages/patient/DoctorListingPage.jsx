@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import PatientNavbar from '../../components/common/PatientNavbar';
+import LandingNavbar from '../../components/common/LandingNavbar';
+import { useAuth } from '../../context/AuthContext';
 import { doctors, specialityData } from '../../assets/assets';
 
 export default function DoctorListingPage() {
@@ -8,6 +10,7 @@ export default function DoctorListingPage() {
   const [selectedSpeciality, setSelectedSpeciality] = useState(searchParams.get('speciality') || '');
   const [filteredDoctors, setFilteredDoctors] = useState(doctors);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     if (selectedSpeciality) {
@@ -27,10 +30,10 @@ export default function DoctorListingPage() {
 
   return (
     <div>
-      <PatientNavbar />
+      {user ? <PatientNavbar /> : <LandingNavbar />}
 
       <div style={{ padding: '24px 40px', color: '#6b7280', fontSize: '0.9rem' }}>
-        <span style={{ cursor: 'pointer' }} onClick={() => navigate('/patient/home')}>Home</span>
+        <span style={{ cursor: 'pointer' }} onClick={() => navigate(user ? '/patient/home' : '/landing')}>Home</span>
         {' / '}
         <span>Doctors</span>
         {selectedSpeciality && <>{' / '}<span>{selectedSpeciality}</span></>}
@@ -79,7 +82,7 @@ export default function DoctorListingPage() {
                 <div
                   key={doc._id}
                   className="doctor-card"
-                  onClick={() => navigate(`/patient/doctors/${doc._id}`)}
+                  onClick={() => navigate(user ? `/patient/doctors/${doc._id}` : `/all-doctors/${doc._id}`)}
                 >
                   <img
                     src={doc.image}

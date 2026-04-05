@@ -29,8 +29,6 @@ export default function PatientNavbar() {
         <ul className="navbar-links">
           <li><Link to="/patient/home" className={isActive('/patient/home') ? 'active' : ''}>HOME</Link></li>
           <li><Link to="/patient/doctors" className={isActive('/patient/doctors') ? 'active' : ''}>ALL DOCTORS</Link></li>
-          <li><Link to="/patient/about" className={isActive('/patient/about') ? 'active' : ''}>ABOUT</Link></li>
-          <li><Link to="/patient/contact" className={isActive('/patient/contact') ? 'active' : ''}>CONTACT</Link></li>
           <li><Link to="/patient/appointments" className={isActive('/patient/appointments') ? 'active' : ''}>MY APPOINTMENTS</Link></li>
         </ul>
 
@@ -79,8 +77,6 @@ export default function PatientNavbar() {
           </button>
           <Link to="/patient/home" onClick={() => setMobileOpen(false)}>HOME</Link>
           <Link to="/patient/doctors" onClick={() => setMobileOpen(false)}>ALL DOCTORS</Link>
-          <Link to="/patient/about" onClick={() => setMobileOpen(false)}>ABOUT</Link>
-          <Link to="/patient/contact" onClick={() => setMobileOpen(false)}>CONTACT</Link>
           <Link to="/patient/appointments" onClick={() => setMobileOpen(false)}>MY APPOINTMENTS</Link>
           {user ? (
             <>

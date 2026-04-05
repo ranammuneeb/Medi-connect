@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import PatientNavbar from '../../components/common/PatientNavbar';
+import LandingNavbar from '../../components/common/LandingNavbar';
+import { useAuth } from '../../context/AuthContext';
 import { doctors, assets } from '../../assets/assets';
 
 // Generate next 7 days (skip Sunday)
@@ -31,6 +33,7 @@ const TIME_SLOTS = [
 export default function DoctorProfilePage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [doctor, setDoctor] = useState(null);
   const [relatedDoctors, setRelatedDoctors] = useState([]);
   const [selectedDay, setSelectedDay] = useState(0);
@@ -48,10 +51,12 @@ export default function DoctorProfilePage() {
     window.scrollTo(0, 0);
   }, [id]);
 
+  const Navbar = user ? PatientNavbar : LandingNavbar;
+
   if (!doctor) {
     return (
       <div>
-        <PatientNavbar />
+        <Navbar />
         <div style={{ padding: '60px 40px', textAlign: 'center', color: '#6b7280' }}>
           <h2>Doctor not found</h2>
         </div>
@@ -61,7 +66,7 @@ export default function DoctorProfilePage() {
 
   return (
     <div>
-      <PatientNavbar />
+      <Navbar />
 
       <div className="profile-page">
         {/* Top section */}
@@ -123,11 +128,12 @@ export default function DoctorProfilePage() {
           <button
             className="btn-primary"
             onClick={() => {
+              if (!user) { navigate('/auth/login'); return; }
               if (!selectedTime) { alert('Please select a time slot'); return; }
               navigate(`/patient/book/${doctor._id}?date=${days[selectedDay].fullDate}&time=${encodeURIComponent(selectedTime)}`);
             }}
           >
-            Book an appointment
+            {user ? 'Book an appointment' : 'Login to Book'}
           </button>
         </div>
 
@@ -143,7 +149,7 @@ export default function DoctorProfilePage() {
                 <div
                   key={doc._id}
                   className="doctor-card"
-                  onClick={() => navigate(`/patient/doctors/${doc._id}`)}
+                  onClick={() => navigate(user ? `/patient/doctors/${doc._id}` : `/all-doctors/${doc._id}`)}
                 >
                   <img src={doc.image} alt={doc.name} className="doctor-card-img" />
                   <div className="doctor-card-body">
