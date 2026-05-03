@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { authAPI } from '../../services/api';
+import { authAPI, specialties } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { assets } from '../../assets/assets';
 
@@ -18,6 +18,7 @@ export default function LoginRegisterPage() {
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
+  const [regSpecialty, setRegSpecialty] = useState('');
 
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -32,7 +33,7 @@ export default function LoginRegisterPage() {
       login(user);
       navigate(role === 'doctor' ? '/doctor/dashboard' : '/patient/home');
     } catch (err) {
-      setError(err.message || 'Login failed');
+      setError(err?.response?.data?.message || err.message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -43,13 +44,20 @@ export default function LoginRegisterPage() {
     setError('');
     if (!regName || !regEmail || !regPassword) { setError('Please fill all fields'); return; }
     if (regPassword.length < 6) { setError('Password must be at least 6 characters'); return; }
+    if (role === 'doctor' && !regSpecialty) { setError('Please select your specialty'); return; }
     setLoading(true);
     try {
-      const user = await authAPI.register({ name: regName, email: regEmail, password: regPassword, role });
+      const user = await authAPI.register({
+        name: regName,
+        email: regEmail,
+        password: regPassword,
+        role,
+        specialty: regSpecialty || undefined,
+      });
       login(user);
       navigate(role === 'doctor' ? '/doctor/dashboard' : '/patient/home');
     } catch (err) {
-      setError(err.message || 'Registration failed');
+      setError(err?.response?.data?.message || err.message || 'Registration failed');
     } finally {
       setLoading(false);
     }
@@ -57,10 +65,6 @@ export default function LoginRegisterPage() {
 
   const switchTab = (tab) => { setActiveTab(tab); setError(''); };
   const switchRole = (r) => { setRole(r); setError(''); };
-
-  const demoCredentials = role === 'patient'
-    ? 'alice@example.com / password123'
-    : 'sarah.johnson@mediconnect.com / password123';
 
   return (
     <div className="auth-page">
@@ -84,16 +88,13 @@ export default function LoginRegisterPage() {
           <button
             onClick={() => switchRole('patient')}
             style={{
-              flex: 1,
-              padding: '9px',
+              flex: 1, padding: '9px',
               border: `1.5px solid ${role === 'patient' ? '#5f6fff' : '#e5e7eb'}`,
               borderRadius: 8,
               background: role === 'patient' ? '#eef0ff' : '#fff',
               color: role === 'patient' ? '#5f6fff' : '#6b7280',
               fontWeight: role === 'patient' ? 600 : 400,
-              cursor: 'pointer',
-              fontSize: '0.88rem',
-              transition: 'all 0.2s',
+              cursor: 'pointer', fontSize: '0.88rem', transition: 'all 0.2s',
             }}
           >
             🧑 Patient
@@ -101,16 +102,13 @@ export default function LoginRegisterPage() {
           <button
             onClick={() => switchRole('doctor')}
             style={{
-              flex: 1,
-              padding: '9px',
+              flex: 1, padding: '9px',
               border: `1.5px solid ${role === 'doctor' ? '#5f6fff' : '#e5e7eb'}`,
               borderRadius: 8,
               background: role === 'doctor' ? '#eef0ff' : '#fff',
               color: role === 'doctor' ? '#5f6fff' : '#6b7280',
               fontWeight: role === 'doctor' ? 600 : 400,
-              cursor: 'pointer',
-              fontSize: '0.88rem',
-              transition: 'all 0.2s',
+              cursor: 'pointer', fontSize: '0.88rem', transition: 'all 0.2s',
             }}
           >
             👨‍⚕️ Doctor
@@ -151,6 +149,16 @@ export default function LoginRegisterPage() {
               <label className="form-label">Password</label>
               <input className="form-control" type="password" placeholder="Min 6 characters" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} />
             </div>
+            {/* Show specialty field only when signing up as a doctor */}
+            {role === 'doctor' && (
+              <div className="mb-3">
+                <label className="form-label">Specialty</label>
+                <select className="form-select" value={regSpecialty} onChange={(e) => setRegSpecialty(e.target.value)}>
+                  <option value="">Select your specialty</option>
+                  {specialties.map((s) => <option key={s}>{s}</option>)}
+                </select>
+              </div>
+            )}
             <button type="submit" className="btn w-100 rounded-pill mt-1" style={{ background: '#5f6fff', color: '#fff', border: 'none' }} disabled={loading}>
               {loading ? 'Creating account...' : `Sign up as ${role === 'patient' ? 'Patient' : 'Doctor'}`}
             </button>
@@ -171,10 +179,6 @@ export default function LoginRegisterPage() {
 
         <div className="text-center mt-2">
           <Link to="/admin/login" style={{ fontSize: '0.8rem', color: '#9ca3af' }}>Admin login →</Link>
-        </div>
-
-        <div className="demo-box">
-          <strong>Demo ({role}):</strong> {demoCredentials}
         </div>
       </div>
     </div>

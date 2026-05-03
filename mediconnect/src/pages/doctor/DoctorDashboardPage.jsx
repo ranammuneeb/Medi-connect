@@ -69,7 +69,7 @@ export default function DoctorDashboardPage() {
                 {todayAppts.length === 0 ? (
                   <div className="text-center py-4 text-muted">No appointments today</div>
                 ) : todayAppts.map((appt) => (
-                  <div key={appt.id} className="d-flex justify-content-between align-items-center p-2 rounded mb-2" style={{ background: '#f9fafb', fontSize: '0.88rem' }}>
+                  <div key={appt._id} className="d-flex justify-content-between align-items-center p-2 rounded mb-2" style={{ background: '#f9fafb', fontSize: '0.88rem' }}>
                     <div>
                       <div className="fw-semibold">{appt.patientName}</div>
                       <div className="text-muted" style={{ fontSize: '0.8rem' }}>{appt.time}</div>
@@ -89,7 +89,7 @@ export default function DoctorDashboardPage() {
                 {upcomingAppts.length === 0 ? (
                   <div className="text-center py-4 text-muted">No upcoming appointments</div>
                 ) : upcomingAppts.slice(0, 5).map((appt) => (
-                  <div key={appt.id} className="d-flex justify-content-between align-items-center p-2 rounded mb-2" style={{ background: '#f9fafb', fontSize: '0.88rem' }}>
+                  <div key={appt._id} className="d-flex justify-content-between align-items-center p-2 rounded mb-2" style={{ background: '#f9fafb', fontSize: '0.88rem' }}>
                     <div>
                       <div className="fw-semibold">{appt.patientName}</div>
                       <div className="text-muted" style={{ fontSize: '0.8rem' }}>{appt.date} · {appt.time}</div>

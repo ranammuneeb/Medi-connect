@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import DoctorSidebar from '../../components/doctor/DoctorSidebar';
-import { doctorsAPI } from '../../services/api';
+import { doctorsAPI, specialties } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -10,11 +10,15 @@ export default function DoctorProfileManagePage() {
   const { user, updateUser } = useAuth();
   const [saving, setSaving] = useState(false);
   const [availability, setAvailability] = useState({});
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const fileInputRef = useRef();
 
   const [name, setName] = useState(user?.name || '');
   const [phone, setPhone] = useState('');
   const [bio, setBio] = useState('');
   const [fee, setFee] = useState('');
+  const [specialty, setSpecialty] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatar || '');
 
   useEffect(() => {
     if (user?.doctorId) {
@@ -23,7 +27,9 @@ export default function DoctorProfileManagePage() {
           setPhone(doc.phone || '');
           setBio(doc.bio || '');
           setFee(doc.consultationFee || '');
+          setSpecialty(doc.specialty || '');
           setAvailability(doc.availability || {});
+          setAvatarUrl(doc.avatar || user?.avatar || '');
         }
       });
     }
@@ -37,17 +43,49 @@ export default function DoctorProfileManagePage() {
     });
   };
 
+  const handleAvatarChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploadingAvatar(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      const res = await fetch('http://localhost:5000/api/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (data.url) {
+        setAvatarUrl(data.url);
+      } else {
+        alert('Upload failed. Please try again.');
+      }
+    } catch {
+      alert('Upload failed. Please try again.');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
     try {
       if (user?.doctorId) {
-        await doctorsAPI.update(user.doctorId, { phone, bio, consultationFee: fee, availability });
+        await doctorsAPI.update(user.doctorId, {
+          phone,
+          bio,
+          consultationFee: fee,
+          specialty,
+          availability,
+          avatar: avatarUrl,
+          name,
+        });
       }
-      updateUser({ name });
+      updateUser({ name, avatar: avatarUrl });
       alert('Profile updated successfully!');
-    } catch {
-      alert('Failed to save changes');
+    } catch (err) {
+      alert(err?.response?.data?.message || 'Failed to save changes');
     } finally {
       setSaving(false);
     }
@@ -63,6 +101,44 @@ export default function DoctorProfileManagePage() {
         </div>
 
         <form onSubmit={handleSave}>
+          {/* Avatar */}
+          <div className="card shadow-sm border-0 mb-3">
+            <div className="card-body d-flex align-items-center gap-4">
+              <div style={{ position: 'relative' }}>
+                <img
+                  src={avatarUrl || `https://randomuser.me/api/portraits/men/1.jpg`}
+                  alt="Profile"
+                  style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', border: '3px solid #eef0ff' }}
+                />
+                {uploadingAvatar && (
+                  <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: 'rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontSize: '0.7rem' }}>
+                    Uploading...
+                  </div>
+                )}
+              </div>
+              <div>
+                <div className="fw-semibold mb-1" style={{ fontSize: '0.9rem' }}>Profile Picture</div>
+                <p className="text-muted mb-2" style={{ fontSize: '0.78rem' }}>Upload a clear photo. Max 5MB.</p>
+                <button
+                  type="button"
+                  className="btn btn-sm rounded"
+                  style={{ border: '1px solid #5f6fff', color: '#5f6fff', background: '#fff', fontSize: '0.8rem' }}
+                  onClick={() => fileInputRef.current.click()}
+                  disabled={uploadingAvatar}
+                >
+                  {uploadingAvatar ? 'Uploading...' : 'Upload Photo'}
+                </button>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={handleAvatarChange}
+                />
+              </div>
+            </div>
+          </div>
+
           {/* Basic info */}
           <div className="card shadow-sm border-0 mb-3">
             <div className="card-body">
@@ -79,6 +155,13 @@ export default function DoctorProfileManagePage() {
                 <div className="col-6">
                   <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 500, color: '#6b7280' }}>Phone</label>
                   <input className="form-control" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                </div>
+                <div className="col-6">
+                  <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 500, color: '#6b7280' }}>Specialty</label>
+                  <select className="form-select" value={specialty} onChange={(e) => setSpecialty(e.target.value)}>
+                    <option value="">Select specialty</option>
+                    {specialties.map((s) => <option key={s}>{s}</option>)}
+                  </select>
                 </div>
                 <div className="col-6">
                   <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 500, color: '#6b7280' }}>Consultation Fee ($)</label>
@@ -129,7 +212,7 @@ export default function DoctorProfileManagePage() {
             </div>
           </div>
 
-          <button type="submit" className="btn rounded" style={{ background: '#5f6fff', color: '#fff', border: 'none', padding: '10px 28px' }} disabled={saving}>
+          <button type="submit" className="btn rounded" style={{ background: '#5f6fff', color: '#fff', border: 'none', padding: '10px 28px' }} disabled={saving || uploadingAvatar}>
             {saving ? 'Saving...' : 'Save changes'}
           </button>
         </form>

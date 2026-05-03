@@ -3,29 +3,40 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import PatientNavbar from '../../components/common/PatientNavbar';
 import LandingNavbar from '../../components/common/LandingNavbar';
 import { useAuth } from '../../context/AuthContext';
-import { doctors, specialityData } from '../../assets/assets';
+import { doctorsAPI, specialties } from '../../services/api';
 
 export default function DoctorListingPage() {
   const [searchParams] = useSearchParams();
   const [selectedSpeciality, setSelectedSpeciality] = useState(searchParams.get('speciality') || '');
-  const [filteredDoctors, setFilteredDoctors] = useState(doctors);
+  const [allDoctors, setAllDoctors] = useState([]);
+  const [filteredDoctors, setFilteredDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  // Fetch all doctors from the real backend
+  useEffect(() => {
+    setLoading(true);
+    doctorsAPI.getAll()
+      .then((data) => {
+        setAllDoctors(data);
+        setFilteredDoctors(data);
+      })
+      .catch(() => { setAllDoctors([]); setFilteredDoctors([]); })
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Filter whenever specialty selection changes
   useEffect(() => {
     if (selectedSpeciality) {
-      setFilteredDoctors(doctors.filter((d) => d.speciality === selectedSpeciality));
+      setFilteredDoctors(allDoctors.filter((d) => d.specialty === selectedSpeciality));
     } else {
-      setFilteredDoctors(doctors);
+      setFilteredDoctors(allDoctors);
     }
-  }, [selectedSpeciality]);
+  }, [selectedSpeciality, allDoctors]);
 
   const handleSpeciality = (spec) => {
-    if (selectedSpeciality === spec) {
-      setSelectedSpeciality('');
-    } else {
-      setSelectedSpeciality(spec);
-    }
+    setSelectedSpeciality((prev) => (prev === spec ? '' : spec));
   };
 
   return (
@@ -43,13 +54,13 @@ export default function DoctorListingPage() {
         {/* Sidebar */}
         <div className="listing-sidebar">
           <h3>Filters</h3>
-          {specialityData.map((item) => (
+          {specialties.map((spec) => (
             <button
-              key={item.speciality}
-              className={`filter-chip ${selectedSpeciality === item.speciality ? 'active' : ''}`}
-              onClick={() => handleSpeciality(item.speciality)}
+              key={spec}
+              className={`filter-chip ${selectedSpeciality === spec ? 'active' : ''}`}
+              onClick={() => handleSpeciality(spec)}
             >
-              {item.speciality}
+              {spec}
             </button>
           ))}
           {selectedSpeciality && (
@@ -66,11 +77,10 @@ export default function DoctorListingPage() {
         {/* Doctor grid */}
         <div className="listing-content">
           <p className="text-muted mb-4" style={{ fontSize: '0.9rem' }}>
-            {filteredDoctors.length} doctor{filteredDoctors.length !== 1 ? 's' : ''} found
-            {selectedSpeciality ? ` for "${selectedSpeciality}"` : ''}
+            {loading ? 'Loading doctors...' : `${filteredDoctors.length} doctor${filteredDoctors.length !== 1 ? 's' : ''} found${selectedSpeciality ? ` for "${selectedSpeciality}"` : ''}`}
           </p>
 
-          {filteredDoctors.length === 0 ? (
+          {!loading && filteredDoctors.length === 0 ? (
             <div className="text-center py-5 text-muted">
               <div style={{ fontSize: '3rem', marginBottom: 12 }}>🔍</div>
               <h3 className="mb-2">No doctors found</h3>
@@ -85,14 +95,14 @@ export default function DoctorListingPage() {
                   onClick={() => navigate(user ? `/patient/doctors/${doc._id}` : `/all-doctors/${doc._id}`)}
                 >
                   <img
-                    src={doc.image}
+                    src={doc.avatar || `https://randomuser.me/api/portraits/men/1.jpg`}
                     alt={doc.name}
                     className="doctor-card-img"
                   />
                   <div className="doctor-card-body">
                     <div className="available-dot">Available</div>
                     <div className="doctor-card-name">{doc.name}</div>
-                    <div className="doctor-card-specialty">{doc.speciality}</div>
+                    <div className="doctor-card-specialty">{doc.specialty}</div>
                   </div>
                 </div>
               ))}

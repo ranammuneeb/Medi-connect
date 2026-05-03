@@ -40,7 +40,7 @@ export default function ManageDoctorsPage() {
     setSaving(true);
     try {
       if (editingDoctor) {
-        await doctorsAPI.update(editingDoctor.id, form);
+        await doctorsAPI.update(editingDoctor._id, form);
       } else {
         await doctorsAPI.create({ ...form, rating: 4.5, avatar: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 70) + 1}.jpg`, availability: {}, licenseNumber: `LIC-${Date.now()}`, joinedDate: new Date().toISOString().split('T')[0] });
       }
@@ -102,7 +102,7 @@ export default function ManageDoctorsPage() {
                       <tr key={i}><td colSpan={7}><div className="skeleton" style={{ height: 20, borderRadius: 4 }} /></td></tr>
                     ))
                   ) : doctorsList.map((doc) => (
-                    <tr key={doc.id}>
+                    <tr key={doc._id}>
                       <td>
                         <div className="d-flex align-items-center gap-2">
                           <img src={doc.avatar} alt={doc.name} style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
@@ -122,7 +122,7 @@ export default function ManageDoctorsPage() {
                       <td>
                         <div className="d-flex gap-2">
                           <button onClick={() => openEdit(doc)} className="btn btn-sm btn-outline-primary" style={{ borderColor: '#5f6fff', color: '#5f6fff', fontSize: '0.8rem' }}>Edit</button>
-                          <button onClick={() => handleDelete(doc.id)} className="btn btn-sm btn-outline-danger" style={{ fontSize: '0.8rem' }}>Delete</button>
+                          <button onClick={() => handleDelete(doc._id)} className="btn btn-sm btn-outline-danger" style={{ fontSize: '0.8rem' }}>Delete</button>
                         </div>
                       </td>
                     </tr>

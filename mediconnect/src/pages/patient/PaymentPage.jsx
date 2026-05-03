@@ -6,8 +6,8 @@ import PatientNavbar from '../../components/common/PatientNavbar';
 import { appointmentsAPI, paymentsAPI } from '../../services/api';
 import { assets } from '../../assets/assets';
 
-// Replace with your Stripe publishable key
-const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
+// Stripe Publishable Key is loaded from .env (VITE_STRIPE_PUBLISHABLE_KEY)
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_TYooMQauvdEDq54NiTphI7jx');
 
 const CheckoutForm = ({ appointment, onSuccess }) => {
   const stripe = useStripe();

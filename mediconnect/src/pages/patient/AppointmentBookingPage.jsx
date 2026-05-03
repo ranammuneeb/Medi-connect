@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import PatientNavbar from '../../components/common/PatientNavbar';
-import { doctors, assets } from '../../assets/assets';
+import { assets } from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
-import { appointmentsAPI } from '../../services/api';
+import { appointmentsAPI, doctorsAPI } from '../../services/api';
 
 function getNextDays() {
   const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
@@ -43,39 +43,57 @@ export default function AppointmentBookingPage() {
     : 0;
 
   const [doctor, setDoctor] = useState(null);
+  const [loadingDoctor, setLoadingDoctor] = useState(true);
   const [selectedDay, setSelectedDay] = useState(preselectedDayIdx >= 0 ? preselectedDayIdx : 0);
   const [selectedTime, setSelectedTime] = useState(preselectedTime);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const doc = doctors.find((d) => d._id === doctorId);
-    setDoctor(doc || null);
+    setLoadingDoctor(true);
+    doctorsAPI.getById(doctorId)
+      .then(setDoctor)
+      .catch(() => setDoctor(null))
+      .finally(() => setLoadingDoctor(false));
   }, [doctorId]);
 
   const handleBook = async () => {
     if (!selectedTime) { setError('Please select a time slot'); return; }
+    if (!user) { navigate('/auth/login'); return; }
     setError('');
     setLoading(true);
     try {
       const appointment = await appointmentsAPI.book({
-        patientId: user.id,
+        patientId: user._id,
         patientName: user.name,
         patientEmail: user.email,
+        patientPhone: user.phone || 'N/A',
         doctorId: doctorId,
         doctorName: doctor.name,
-        specialty: doctor.speciality,
+        specialty: doctor.specialty,
         date: days[selectedDay].fullDate,
         time: selectedTime,
-        fee: doctor.fees,
+        symptoms: '',
+        fee: doctor.consultationFee,
       });
-      navigate(`/patient/payment/${appointment.id}`);
+      navigate(`/patient/payment/${appointment._id}`);
     } catch (err) {
-      setError(err.message || 'Booking failed. Please try again.');
+      setError(err?.response?.data?.message || err.message || 'Booking failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+
+  if (loadingDoctor) {
+    return (
+      <div>
+        <PatientNavbar />
+        <div style={{ padding: '60px 40px', textAlign: 'center', color: '#6b7280' }}>
+          <h2>Loading doctor...</h2>
+        </div>
+      </div>
+    );
+  }
 
   if (!doctor) {
     return (
@@ -97,7 +115,7 @@ export default function AppointmentBookingPage() {
         <div style={{
           display: 'flex',
           gap: 20,
-          alignItems: 'center',
+          alignItems: 'flex-start',
           padding: 24,
           border: '1px solid #e5e7eb',
           borderRadius: 12,
@@ -105,7 +123,7 @@ export default function AppointmentBookingPage() {
           background: '#fff',
         }}>
           <img
-            src={doctor.image}
+            src={doctor.avatar || `https://randomuser.me/api/portraits/men/1.jpg`}
             alt={doctor.name}
             style={{ width: 100, height: 100, borderRadius: 10, objectFit: 'cover', background: '#eef0ff', flexShrink: 0 }}
           />
@@ -115,20 +133,24 @@ export default function AppointmentBookingPage() {
               <img src={assets.verified_icon} alt="verified" style={{ width: 18 }} />
             </div>
             <div style={{ color: '#6b7280', fontSize: '0.88rem', marginBottom: 8 }}>
-              {doctor.degree} – {doctor.speciality} &nbsp;
-              <span style={{ border: '1px solid #e5e7eb', borderRadius: 4, padding: '2px 8px', fontSize: '0.78rem', color: '#374151' }}>
-                {doctor.experience}
-              </span>
+              {doctor.specialty}&nbsp;
+              {doctor.experience > 0 && (
+                <span style={{ border: '1px solid #e5e7eb', borderRadius: 4, padding: '2px 8px', fontSize: '0.78rem', color: '#374151' }}>
+                  {doctor.experience} yrs exp.
+                </span>
+              )}
             </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <img src={assets.info_icon} alt="" style={{ width: 14 }} />
-              <span style={{ color: '#374151', fontSize: '0.85rem', fontWeight: 500 }}>About</span>
-            </div>
+            {doctor.bio && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                <img src={assets.info_icon} alt="" style={{ width: 14 }} />
+                <span style={{ color: '#374151', fontSize: '0.85rem', fontWeight: 500 }}>About</span>
+              </div>
+            )}
             <p style={{ color: '#6b7280', fontSize: '0.82rem', marginTop: 6, maxWidth: 520, lineHeight: 1.6 }}>
-              {doctor.about}
+              {doctor.bio}
             </p>
             <div style={{ marginTop: 8, fontSize: '0.88rem', color: '#374151' }}>
-              Appointment fee: <strong style={{ color: '#5f6fff' }}>${doctor.fees}</strong>
+              Appointment fee: <strong style={{ color: '#5f6fff' }}>${doctor.consultationFee}</strong>
             </div>
           </div>
         </div>
@@ -171,7 +193,7 @@ export default function AppointmentBookingPage() {
 
         {selectedTime && (
           <div style={{ background: '#eef0ff', borderRadius: 10, padding: '14px 20px', marginBottom: 20, fontSize: '0.88rem', color: '#374151' }}>
-            <strong>Selected:</strong> {days[selectedDay].label} {days[selectedDay].date} &nbsp;|&nbsp; {selectedTime} &nbsp;|&nbsp; Fee: ${doctor.fees}
+            <strong>Selected:</strong> {days[selectedDay].label} {days[selectedDay].date} &nbsp;|&nbsp; {selectedTime} &nbsp;|&nbsp; Fee: ${doctor.consultationFee}
           </div>
         )}
 

@@ -82,7 +82,7 @@ export default function DoctorAppointmentsPage() {
                   ) : filtered.length === 0 ? (
                     <tr><td colSpan={7} className="text-center py-4 text-muted">No appointments found</td></tr>
                   ) : filtered.map((appt, i) => (
-                    <tr key={appt.id}>
+                    <tr key={appt._id}>
                       <td className="text-muted">{i + 1}</td>
                       <td className="fw-medium">{appt.patientName}</td>
                       <td className="text-muted">{appt.date} · {appt.time}</td>
@@ -100,7 +100,7 @@ export default function DoctorAppointmentsPage() {
                           className="form-select form-select-sm"
                           style={{ fontSize: '0.82rem' }}
                           value={appt.status}
-                          onChange={(e) => handleStatusChange(appt.id, e.target.value)}
+                          onChange={(e) => handleStatusChange(appt._id, e.target.value)}
                         >
                           {statusOptions.map((s) => <option key={s}>{s}</option>)}
                         </select>

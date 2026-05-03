@@ -44,4 +44,17 @@ const updateDoctor = async (req, res) => {
   }
 };
 
-module.exports = { getDoctors, getDoctorById, updateDoctor };
+const deleteDoctor = async (req, res) => {
+  try {
+    const doctor = await Doctor.findByIdAndDelete(req.params.id);
+    if (doctor) {
+      res.json({ message: 'Doctor removed' });
+    } else {
+      res.status(404).json({ message: 'Doctor not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getDoctors, getDoctorById, updateDoctor, deleteDoctor };

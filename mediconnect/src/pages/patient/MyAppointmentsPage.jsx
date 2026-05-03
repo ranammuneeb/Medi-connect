@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PatientNavbar from '../../components/common/PatientNavbar';
 import { appointmentsAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
-import { doctors } from '../../assets/assets';
 
 export default function MyAppointmentsPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const fetchAppointments = async () => {
     setLoading(true);
     try {
-      const data = await appointmentsAPI.getAll({ patientId: user?.id });
+      // Use user._id (the real MongoDB ID from the backend)
+      const data = await appointmentsAPI.getAll({ patientId: user?._id });
       setAppointments(data);
     } catch {
       setAppointments([]);
@@ -22,8 +24,8 @@ export default function MyAppointmentsPage() {
   };
 
   useEffect(() => {
-    if (user?.id) fetchAppointments();
-  }, [user?.id]);
+    if (user?._id) fetchAppointments();
+  }, [user?._id]);
 
   const handleCancel = async (id) => {
     if (!window.confirm('Cancel this appointment?')) return;
@@ -33,12 +35,6 @@ export default function MyAppointmentsPage() {
     } catch {
       alert('Failed to cancel appointment');
     }
-  };
-
-  // Find doctor image from assets
-  const getDoctorImage = (doctorName) => {
-    const match = doctors.find((d) => d.name === doctorName);
-    return match ? match.image : null;
   };
 
   const statusClass = {
@@ -61,9 +57,7 @@ export default function MyAppointmentsPage() {
         </p>
 
         {loading ? (
-          <div className="text-center py-5 text-muted">
-            Loading...
-          </div>
+          <div className="text-center py-5 text-muted">Loading...</div>
         ) : appointments.length === 0 ? (
           <div className="text-center py-5 text-muted">
             <div style={{ fontSize: '3rem', marginBottom: 12 }}>📭</div>
@@ -72,19 +66,14 @@ export default function MyAppointmentsPage() {
           </div>
         ) : (
           appointments.map((appt) => {
-            const docImage = getDoctorImage(appt.doctorName);
             const apptDate = new Date(appt.date);
             const isUpcoming = (appt.status === 'confirmed' || appt.status === 'pending') && apptDate >= now;
             return (
-              <div key={appt.id} className="appt-card">
+              <div key={appt._id} className="appt-card">
                 {/* Doctor image */}
-                {docImage ? (
-                  <img src={docImage} alt={appt.doctorName} style={{ width: 56, height: 56, borderRadius: 8, objectFit: 'cover', background: '#eef0ff', flexShrink: 0 }} />
-                ) : (
-                  <div style={{ width: 56, height: 56, borderRadius: 8, background: '#eef0ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 }}>
-                    👨‍⚕️
-                  </div>
-                )}
+                <div style={{ width: 56, height: 56, borderRadius: 8, background: '#eef0ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 }}>
+                  👨‍⚕️
+                </div>
 
                 {/* Info */}
                 <div style={{ flex: 1 }}>
@@ -94,7 +83,7 @@ export default function MyAppointmentsPage() {
                     <strong>Date &amp; Time:</strong> {appt.date}, {appt.time}
                   </div>
                   <div className="text-muted mt-1" style={{ fontSize: '0.82rem' }}>
-                    <strong>Address:</strong> 17th Cross, Richmond Circle, Ring Road, London
+                    <strong>Fee:</strong> ${appt.fee}
                   </div>
                 </div>
 
@@ -107,7 +96,7 @@ export default function MyAppointmentsPage() {
                     <button
                       className="btn btn-sm rounded-pill"
                       style={{ border: '1px solid #e5e7eb', background: '#fff', color: '#2d3748', fontSize: '0.82rem' }}
-                      onClick={() => handleCancel(appt.id)}
+                      onClick={() => handleCancel(appt._id)}
                     >
                       Cancel appointment
                     </button>
@@ -116,7 +105,7 @@ export default function MyAppointmentsPage() {
                     <button
                       className="btn btn-sm rounded-pill"
                       style={{ background: '#5f6fff', color: '#fff', border: 'none', fontSize: '0.82rem' }}
-                      onClick={() => alert('Payment flow coming soon')}
+                      onClick={() => navigate(`/patient/payment/${appt._id}`)}
                     >
                       Pay online
                     </button>

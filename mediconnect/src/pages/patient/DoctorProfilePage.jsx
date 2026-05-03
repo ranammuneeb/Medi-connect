@@ -3,16 +3,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import PatientNavbar from '../../components/common/PatientNavbar';
 import LandingNavbar from '../../components/common/LandingNavbar';
 import { useAuth } from '../../context/AuthContext';
-import { doctors, assets } from '../../assets/assets';
+import { doctorsAPI } from '../../services/api';
+import { assets } from '../../assets/assets';
 
-// Generate next 7 days (skip Sunday)
 function getNextDays() {
   const days = [];
   const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
   let d = new Date();
-  d.setDate(d.getDate() + 1); // start from tomorrow
+  d.setDate(d.getDate() + 1);
   while (days.length < 7) {
-    if (d.getDay() !== 0) { // skip Sunday
+    if (d.getDay() !== 0) {
       days.push({
         label: dayNames[d.getDay()],
         date: d.getDate(),
@@ -36,30 +36,45 @@ export default function DoctorProfilePage() {
   const { user } = useAuth();
   const [doctor, setDoctor] = useState(null);
   const [relatedDoctors, setRelatedDoctors] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState(0);
   const [selectedTime, setSelectedTime] = useState('');
   const days = getNextDays();
 
   useEffect(() => {
-    const doc = doctors.find((d) => d._id === id);
-    setDoctor(doc || null);
-    if (doc) {
-      setRelatedDoctors(doctors.filter((d) => d.speciality === doc.speciality && d._id !== id).slice(0, 5));
-    }
+    setLoading(true);
     setSelectedDay(0);
     setSelectedTime('');
     window.scrollTo(0, 0);
+    doctorsAPI.getById(id)
+      .then((doc) => {
+        setDoctor(doc);
+        // Fetch related doctors by specialty
+        return doctorsAPI.getAll({ specialty: doc.specialty });
+      })
+      .then((all) => {
+        setRelatedDoctors(all.filter((d) => d._id !== id).slice(0, 5));
+      })
+      .catch(() => setDoctor(null))
+      .finally(() => setLoading(false));
   }, [id]);
 
   const Navbar = user ? PatientNavbar : LandingNavbar;
+
+  if (loading) {
+    return (
+      <div>
+        <Navbar />
+        <div className="text-center py-5 text-muted"><h2>Loading...</h2></div>
+      </div>
+    );
+  }
 
   if (!doctor) {
     return (
       <div>
         <Navbar />
-        <div className="text-center py-5 text-muted">
-          <h2>Doctor not found</h2>
-        </div>
+        <div className="text-center py-5 text-muted"><h2>Doctor not found</h2></div>
       </div>
     );
   }
@@ -71,25 +86,31 @@ export default function DoctorProfilePage() {
       <div className="profile-page">
         {/* Top section */}
         <div className="profile-top">
-          <img src={doctor.image} alt={doctor.name} className="profile-img" />
+          <img
+            src={doctor.avatar || `https://randomuser.me/api/portraits/men/1.jpg`}
+            alt={doctor.name}
+            className="profile-img"
+          />
           <div className="profile-info">
             <div className="profile-name">
               {doctor.name}
               <img src={assets.verified_icon} alt="verified" className="verified-badge" />
             </div>
             <div className="profile-degree">
-              {doctor.degree} – {doctor.speciality}
-              <span className="profile-exp">{doctor.experience}</span>
+              {doctor.specialty}
+              {doctor.experience > 0 && (
+                <span className="profile-exp">{doctor.experience} yrs exp.</span>
+              )}
             </div>
             <div className="profile-about">
               <h3>
                 About{' '}
                 <img src={assets.info_icon} alt="" style={{ width: 16, verticalAlign: 'middle' }} />
               </h3>
-              <p>{doctor.about}</p>
+              <p>{doctor.bio || 'No bio provided yet.'}</p>
             </div>
             <div className="fee-row">
-              Appointment fee: <strong>${doctor.fees}</strong>
+              Appointment fee: <strong>${doctor.consultationFee}</strong>
             </div>
           </div>
         </div>
@@ -98,7 +119,6 @@ export default function DoctorProfilePage() {
         <div className="slot-section" style={{ marginBottom: 40 }}>
           <h3>Booking slots</h3>
 
-          {/* Day selector */}
           <div className="day-slots">
             {days.map((day, i) => (
               <button
@@ -112,7 +132,6 @@ export default function DoctorProfilePage() {
             ))}
           </div>
 
-          {/* Time slots */}
           <div className="time-slots">
             {TIME_SLOTS.map((slot) => (
               <button
@@ -152,11 +171,11 @@ export default function DoctorProfilePage() {
                   className="doctor-card"
                   onClick={() => navigate(user ? `/patient/doctors/${doc._id}` : `/all-doctors/${doc._id}`)}
                 >
-                  <img src={doc.image} alt={doc.name} className="doctor-card-img" />
+                  <img src={doc.avatar || `https://randomuser.me/api/portraits/men/1.jpg`} alt={doc.name} className="doctor-card-img" />
                   <div className="doctor-card-body">
                     <div className="available-dot">Available</div>
                     <div className="doctor-card-name">{doc.name}</div>
-                    <div className="doctor-card-specialty">{doc.speciality}</div>
+                    <div className="doctor-card-specialty">{doc.specialty}</div>
                   </div>
                 </div>
               ))}
