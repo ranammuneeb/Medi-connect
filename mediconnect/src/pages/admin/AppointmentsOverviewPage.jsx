@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import { appointmentsAPI } from '../../services/api';
 
-const statusOptions = ['', 'confirmed', 'pending', 'completed', 'cancelled'];
-const statusClass = { confirmed: 'status-confirmed', pending: 'status-pending', cancelled: 'status-cancelled', completed: 'status-completed' };
+const statusOptions = ['', 'confirmed', 'pending', 'in-progress', 'completed', 'cancelled'];
+const statusClass = { confirmed: 'status-confirmed', pending: 'status-pending', 'in-progress': 'status-in-progress', cancelled: 'status-cancelled', completed: 'status-completed' };
 
 export default function AppointmentsOverviewPage() {
   const [appointments, setAppointments] = useState([]);
@@ -98,7 +98,12 @@ export default function AppointmentsOverviewPage() {
                           value={appt.status}
                           onChange={(e) => handleStatusChange(appt._id, e.target.value)}
                         >
-                          {statusOptions.slice(1).map((s) => <option key={s}>{s}</option>)}
+                          {['pending', 'confirmed', 'cancelled'].map(s => (
+                            <option key={s} value={s}>{s}</option>
+                          ))}
+                          {['in-progress', 'completed'].includes(appt.status) && (
+                            <option value={appt.status} disabled>{appt.status}</option>
+                          )}
                         </select>
                       </td>
                     </tr>

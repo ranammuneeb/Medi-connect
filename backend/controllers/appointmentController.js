@@ -20,8 +20,12 @@ const bookAppointment = async (req, res) => {
   try {
     const { patientId, patientName, patientEmail, patientPhone, doctorId, doctorName, specialty, date, time, symptoms, fee } = req.body;
     
+    // Fetch doctor avatar
+    const doctor = await Doctor.findById(doctorId);
+    const doctorAvatar = doctor ? doctor.avatar : '';
+
     const appointment = await Appointment.create({
-      patientId, patientName, patientEmail, patientPhone, doctorId, doctorName, specialty, date, time, symptoms, fee
+      patientId, patientName, patientEmail, patientPhone, doctorId, doctorName, doctorAvatar, specialty, date, time, symptoms, fee
     });
     
     res.status(201).json(appointment);
@@ -40,10 +44,16 @@ const updateAppointmentStatus = async (req, res) => {
       return res.status(403).json({ message: 'Patients can only cancel appointments' });
     }
 
-    // Doctors can only set confirmed or completed — not cancel
-    const doctorAllowedStatuses = ['confirmed', 'completed'];
+    // Doctors: completed, in-progress, cancelled
+    const doctorAllowedStatuses = ['in-progress', 'completed', 'cancelled'];
     if (userRole === 'doctor' && !doctorAllowedStatuses.includes(status)) {
-      return res.status(403).json({ message: 'Doctors can only set status to confirmed or completed' });
+      return res.status(403).json({ message: 'Doctors can only set status to in-progress, completed, or cancelled' });
+    }
+
+    // Admin: confirmed, cancelled, pending
+    const adminAllowedStatuses = ['confirmed', 'cancelled', 'pending'];
+    if (userRole === 'admin' && !adminAllowedStatuses.includes(status)) {
+      return res.status(403).json({ message: 'Admins can only set status to confirmed, cancelled, or pending' });
     }
 
     const appointment = await Appointment.findByIdAndUpdate(

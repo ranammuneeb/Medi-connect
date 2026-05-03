@@ -40,6 +40,7 @@ export default function MyAppointmentsPage() {
   const statusClass = {
     confirmed: 'status-confirmed',
     pending: 'status-pending',
+    'in-progress': 'status-in-progress',
     cancelled: 'status-cancelled',
     completed: 'status-completed',
   };
@@ -71,8 +72,12 @@ export default function MyAppointmentsPage() {
             return (
               <div key={appt._id} className="appt-card">
                 {/* Doctor image */}
-                <div style={{ width: 56, height: 56, borderRadius: 8, background: '#eef0ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.4rem', flexShrink: 0 }}>
-                  👨‍⚕️
+                <div style={{ flexShrink: 0 }}>
+                  <img 
+                    src={appt.doctorAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(appt.doctorName)}&background=5f6fff&color=fff&size=128&bold=true`} 
+                    alt={appt.doctorName} 
+                    style={{ width: 80, height: 80, borderRadius: 12, objectFit: 'cover', background: '#eef0ff' }} 
+                  />
                 </div>
 
                 {/* Info */}

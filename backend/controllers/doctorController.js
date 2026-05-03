@@ -57,4 +57,48 @@ const deleteDoctor = async (req, res) => {
   }
 };
 
-module.exports = { getDoctors, getDoctorById, updateDoctor, deleteDoctor };
+const User = require('../models/User');
+
+const createDoctor = async (req, res) => {
+  try {
+    const { name, email, specialty, location, experience, consultationFee, phone, education, bio, avatar } = req.body;
+
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: 'Doctor email already exists' });
+    }
+
+    // Create doctor profile
+    const doctor = await Doctor.create({
+      name,
+      email,
+      specialty,
+      location,
+      experience: Number(experience) || 0,
+      consultationFee: Number(consultationFee) || 100,
+      phone,
+      education,
+      bio,
+      avatar,
+      rating: 4.5,
+      availability: {},
+    });
+
+    // Create user account for the doctor
+    await User.create({
+      name,
+      email,
+      password: 'doctor123', // Default password
+      role: 'doctor',
+      phone,
+      avatar,
+      doctorId: doctor._id,
+    });
+
+    res.status(201).json(doctor);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { getDoctors, getDoctorById, updateDoctor, deleteDoctor, createDoctor };

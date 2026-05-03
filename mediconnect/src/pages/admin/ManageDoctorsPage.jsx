@@ -37,17 +37,34 @@ export default function ManageDoctorsPage() {
   const handleSave = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.specialty) { alert('Name, email and specialty are required'); return; }
+    
+    // Validation: Phone (digits only)
+    if (form.phone && !/^\d+$/.test(form.phone)) {
+      alert('Phone number must contain only digits');
+      return;
+    }
+    if (form.phone && (form.phone.length < 10 || form.phone.length > 15)) {
+      alert('Phone number should be between 10 and 15 digits');
+      return;
+    }
+
     setSaving(true);
     try {
       if (editingDoctor) {
         await doctorsAPI.update(editingDoctor._id, form);
       } else {
-        await doctorsAPI.create({ ...form, rating: 4.5, avatar: `https://randomuser.me/api/portraits/men/${Math.floor(Math.random() * 70) + 1}.jpg`, availability: {}, licenseNumber: `LIC-${Date.now()}`, joinedDate: new Date().toISOString().split('T')[0] });
+        await doctorsAPI.create({ 
+          ...form, 
+          rating: 4.5, 
+          avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(form.name)}&background=5f6fff&color=fff&size=128&bold=true`, 
+          availability: {} 
+        });
+        alert('Doctor added successfully! Default password: doctor123');
       }
       setShowModal(false);
       fetchDoctors();
     } catch (err) {
-      alert(err.message || 'Failed to save');
+      alert(err.response?.data?.message || err.message || 'Failed to save');
     } finally {
       setSaving(false);
     }
@@ -105,7 +122,11 @@ export default function ManageDoctorsPage() {
                     <tr key={doc._id}>
                       <td>
                         <div className="d-flex align-items-center gap-2">
-                          <img src={doc.avatar} alt={doc.name} style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} />
+                          <img 
+                            src={doc.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(doc.name)}&background=5f6fff&color=fff`} 
+                            alt={doc.name} 
+                            style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover' }} 
+                          />
                           <div>
                             <div className="fw-semibold">{doc.name}</div>
                             <div className="text-muted" style={{ fontSize: '0.78rem' }}>{doc.email}</div>
@@ -116,7 +137,7 @@ export default function ManageDoctorsPage() {
                         <span className="badge rounded-pill" style={{ background: '#eef0ff', color: '#5f6fff', fontSize: '0.78rem', fontWeight: 500 }}>{doc.specialty}</span>
                       </td>
                       <td className="text-muted">{doc.location}</td>
-                      <td>{doc.experience} yrs</td>
+                      <td>{doc.experience || 0} yrs</td>
                       <td className="fw-semibold" style={{ color: '#5f6fff' }}>${doc.consultationFee}</td>
                       <td>⭐ {doc.rating}</td>
                       <td>
@@ -145,15 +166,25 @@ export default function ManageDoctorsPage() {
               </div>
               <form onSubmit={handleSave}>
                 <div className="row g-3">
-                  {[['name', 'Full Name *', 'text'], ['email', 'Email *', 'email'], ['phone', 'Phone', 'text'], ['education', 'Education', 'text']].map(([key, label, type]) => (
-                    <div key={key} className="col-6">
-                      <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 500, color: '#6b7280' }}>{label}</label>
-                      <input className="form-control" type={type} value={form[key]} onChange={(e) => setField(key, e.target.value)} />
-                    </div>
-                  ))}
+                  <div className="col-6">
+                    <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 500, color: '#6b7280' }}>Full Name *</label>
+                    <input className="form-control" type="text" value={form.name} onChange={(e) => setField('name', e.target.value)} required />
+                  </div>
+                  <div className="col-6">
+                    <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 500, color: '#6b7280' }}>Email *</label>
+                    <input className="form-control" type="email" value={form.email} onChange={(e) => setField('email', e.target.value)} required />
+                  </div>
+                  <div className="col-6">
+                    <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 500, color: '#6b7280' }}>Phone</label>
+                    <input className="form-control" type="text" placeholder="e.g. 03258000282" value={form.phone} onChange={(e) => setField('phone', e.target.value)} />
+                  </div>
+                  <div className="col-6">
+                    <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 500, color: '#6b7280' }}>Education</label>
+                    <input className="form-control" type="text" value={form.education} onChange={(e) => setField('education', e.target.value)} />
+                  </div>
                   <div className="col-6">
                     <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 500, color: '#6b7280' }}>Specialty *</label>
-                    <select className="form-select" value={form.specialty} onChange={(e) => setField('specialty', e.target.value)}>
+                    <select className="form-select" value={form.specialty} onChange={(e) => setField('specialty', e.target.value)} required>
                       <option value="">Select</option>
                       {specialties.map((s) => <option key={s}>{s}</option>)}
                     </select>

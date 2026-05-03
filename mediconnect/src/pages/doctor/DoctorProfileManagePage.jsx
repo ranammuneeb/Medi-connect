@@ -18,6 +18,7 @@ export default function DoctorProfileManagePage() {
   const [bio, setBio] = useState('');
   const [fee, setFee] = useState('');
   const [specialty, setSpecialty] = useState('');
+  const [experience, setExperience] = useState('');
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar || '');
 
   useEffect(() => {
@@ -28,6 +29,7 @@ export default function DoctorProfileManagePage() {
           setBio(doc.bio || '');
           setFee(doc.consultationFee || '');
           setSpecialty(doc.specialty || '');
+          setExperience(doc.experience || '');
           setAvailability(doc.availability || {});
           setAvatarUrl(doc.avatar || user?.avatar || '');
         }
@@ -69,6 +71,19 @@ export default function DoctorProfileManagePage() {
 
   const handleSave = async (e) => {
     e.preventDefault();
+    
+    // Validation
+    if (!name.trim()) { alert('Name is required'); return; }
+    if (phone && !/^\d+$/.test(phone)) {
+      alert('Phone number must contain only digits');
+      return;
+    }
+    if (phone && (phone.length < 10 || phone.length > 15)) {
+      alert('Phone number should be between 10 and 15 digits');
+      return;
+    }
+    if (fee < 0) { alert('Fee cannot be negative'); return; }
+
     setSaving(true);
     try {
       if (user?.doctorId) {
@@ -80,6 +95,7 @@ export default function DoctorProfileManagePage() {
           availability,
           avatar: avatarUrl,
           name,
+          experience: Number(experience) || 0, // Ensure experience is saved
         });
       }
       updateUser({ name, avatar: avatarUrl });
@@ -162,6 +178,10 @@ export default function DoctorProfileManagePage() {
                     <option value="">Select specialty</option>
                     {specialties.map((s) => <option key={s}>{s}</option>)}
                   </select>
+                </div>
+                <div className="col-6">
+                  <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 500, color: '#6b7280' }}>Experience (yrs)</label>
+                  <input className="form-control" type="number" min={0} value={experience} onChange={(e) => setExperience(e.target.value)} />
                 </div>
                 <div className="col-6">
                   <label className="form-label" style={{ fontSize: '0.8rem', fontWeight: 500, color: '#6b7280' }}>Consultation Fee ($)</label>
