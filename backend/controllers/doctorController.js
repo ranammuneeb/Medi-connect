@@ -30,6 +30,9 @@ const getDoctorById = async (req, res) => {
 
 const updateDoctor = async (req, res) => {
   try {
+    if (req.user.role !== 'admin' && String(req.user.doctorId) !== String(req.params.id)) {
+      return res.status(403).json({ message: 'Not authorized to update this profile' });
+    }
     const doctor = await Doctor.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (doctor) {
       res.json(doctor);
