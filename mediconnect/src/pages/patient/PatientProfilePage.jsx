@@ -19,7 +19,6 @@ export default function PatientProfilePage() {
   const [dob, setDob] = useState(user?.dob || '');
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar || '');
 
-
   const initialsAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=5f6fff&color=fff&size=128`;
 
   const handleAvatarChange = async (e) => {
@@ -36,7 +35,6 @@ export default function PatientProfilePage() {
       const data = await res.json();
       if (data.url) {
         setAvatarUrl(data.url);
-
         updateUser({ avatar: data.url });
       } else {
         alert('Upload failed. Please try again.');
@@ -61,7 +59,6 @@ export default function PatientProfilePage() {
       <PatientNavbar />
 
       <div className="px-4 py-4" style={{ maxWidth: 800, margin: '0 auto' }}>
-        {}
         <div className="d-flex align-items-end gap-3 mb-4">
           <div style={{ position: 'relative' }}>
             <img
@@ -69,7 +66,6 @@ export default function PatientProfilePage() {
               alt={user?.name}
               style={{ width: 120, height: 120, borderRadius: 12, objectFit: 'cover', background: '#eef0ff' }}
             />
-            {}
             <button
               type="button"
               onClick={() => fileInputRef.current.click()}
@@ -89,7 +85,21 @@ export default function PatientProfilePage() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image}
+              accept="image/*"
+              style={{ display: 'none' }}
+              onChange={handleAvatarChange}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            {isEdit ? (
+              <input className="form-control fw-bold h4 mb-0" style={{ maxWidth: 300 }} value={name} onChange={(e) => setName(e.target.value)} />
+            ) : (
+              <h2 className="fw-bold mb-0" style={{ fontSize: '1.4rem' }}>{name}</h2>
+            )}
+            <p className="text-muted mt-1 mb-0" style={{ fontSize: '0.88rem' }}>Patient ID: {user?._id?.slice(-6)}</p>
+          </div>
+        </div>
+
         <h3 className="text-muted fw-semibold mb-3" style={{ fontSize: '0.95rem' }}>CONTACT INFORMATION</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: '12px 0', marginBottom: 32, fontSize: '0.9rem' }}>
           <span className="text-muted fw-medium">Email:</span>
@@ -117,7 +127,6 @@ export default function PatientProfilePage() {
 
         <hr className="mb-4" />
 
-        {}
         <h3 className="text-muted fw-semibold mb-3" style={{ fontSize: '0.95rem' }}>BASIC INFORMATION</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: '12px 0', fontSize: '0.9rem', marginBottom: 32 }}>
           <span className="text-muted fw-medium">Gender:</span>
@@ -140,18 +149,17 @@ export default function PatientProfilePage() {
           )}
         </div>
 
-        {}
         {isEdit ? (
           <div className="d-flex gap-3">
-            <button className="btn btn-outline-primary rounded" style={{ borderColor: '#5f6fff', color: '#5f6fff', padding: '8px 24px' }} onClick={() => setIsEdit(false)}>
+            <button className="btn-outline" style={{ padding: '8px 24px' }} onClick={() => setIsEdit(false)}>
               Cancel
             </button>
-            <button className="btn rounded" style={{ background: '#5f6fff', color: '#fff', border: 'none', padding: '8px 24px' }} onClick={handleSave} disabled={saving}>
+            <button className="btn-primary" style={{ padding: '8px 24px' }} onClick={handleSave} disabled={saving}>
               {saving ? 'Saving...' : 'Save information'}
             </button>
           </div>
         ) : (
-          <button className="btn btn-outline-primary rounded" style={{ borderColor: '#5f6fff', color: '#5f6fff', padding: '8px 24px' }} onClick={() => setIsEdit(true)}>
+          <button className="btn-outline" style={{ padding: '8px 24px' }} onClick={() => setIsEdit(true)}>
             Edit
           </button>
         )}
