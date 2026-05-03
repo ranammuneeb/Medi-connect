@@ -40,7 +40,7 @@ const register = async (req, res) => {
     }
 
     let doctorId = null;
-    let avatar = `https://randomuser.me/api/portraits/${otherDetails.gender === 'Female' ? 'women' : 'men'}/${Math.floor(Math.random() * 70) + 1}.jpg`;
+    const avatar = ''; // Avatar will be uploaded by the user themselves
 
     if (role === 'doctor') {
       const doctor = await Doctor.create({

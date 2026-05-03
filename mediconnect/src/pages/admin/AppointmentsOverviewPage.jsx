@@ -82,7 +82,7 @@ export default function AppointmentsOverviewPage() {
                   ) : filtered.length === 0 ? (
                     <tr><td colSpan={7} className="text-center py-4 text-muted">No appointments found</td></tr>
                   ) : filtered.map((appt) => (
-                    <tr key={appt.id}>
+                    <tr key={appt._id}>
                       <td className="fw-medium">{appt.patientName}</td>
                       <td>{appt.doctorName}</td>
                       <td className="text-muted">{appt.specialty}</td>
@@ -96,7 +96,7 @@ export default function AppointmentsOverviewPage() {
                           className="form-select form-select-sm"
                           style={{ fontSize: '0.82rem' }}
                           value={appt.status}
-                          onChange={(e) => handleStatusChange(appt.id, e.target.value)}
+                          onChange={(e) => handleStatusChange(appt._id, e.target.value)}
                         >
                           {statusOptions.slice(1).map((s) => <option key={s}>{s}</option>)}
                         </select>

@@ -3,7 +3,8 @@ import DoctorSidebar from '../../components/doctor/DoctorSidebar';
 import { appointmentsAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
-const statusOptions = ['confirmed', 'pending', 'completed', 'cancelled'];
+// Doctors may only mark appointments as confirmed or completed
+const DOCTOR_STATUS_OPTIONS = ['confirmed', 'completed'];
 const statusClass = { confirmed: 'status-confirmed', pending: 'status-pending', cancelled: 'status-cancelled', completed: 'status-completed' };
 
 export default function DoctorAppointmentsPage() {
@@ -102,7 +103,7 @@ export default function DoctorAppointmentsPage() {
                           value={appt.status}
                           onChange={(e) => handleStatusChange(appt._id, e.target.value)}
                         >
-                          {statusOptions.map((s) => <option key={s}>{s}</option>)}
+                          {DOCTOR_STATUS_OPTIONS.map((s) => <option key={s}>{s}</option>)}
                         </select>
                       </td>
                     </tr>

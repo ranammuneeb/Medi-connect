@@ -33,8 +33,25 @@ const bookAppointment = async (req, res) => {
 const updateAppointmentStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const appointment = await Appointment.findByIdAndUpdate(req.params.id, { status }, { new: true });
-    
+    const userRole = req.user.role;
+
+    // Patients cannot change appointment status
+    if (userRole === 'patient') {
+      return res.status(403).json({ message: 'Patients are not allowed to change appointment status' });
+    }
+
+    // Doctors can only set confirmed or completed — not cancel
+    const doctorAllowedStatuses = ['confirmed', 'completed'];
+    if (userRole === 'doctor' && !doctorAllowedStatuses.includes(status)) {
+      return res.status(403).json({ message: 'Doctors can only set status to confirmed or completed' });
+    }
+
+    const appointment = await Appointment.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+
     if (appointment) {
       res.json(appointment);
     } else {
