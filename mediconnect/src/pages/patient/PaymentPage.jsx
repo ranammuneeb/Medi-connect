@@ -53,7 +53,7 @@ const CheckoutForm = ({ appointment, onSuccess }) => {
     } else {
       // Payment succeeded!
       try {
-        await paymentsAPI.confirmPayment(appointment._id);
+        await paymentsAPI.confirmPayment({ appointmentId: appointment._id, transactionId: payload.paymentIntent.id });
         setProcessing(false);
         onSuccess(payload.paymentIntent.id);
       } catch (err) {

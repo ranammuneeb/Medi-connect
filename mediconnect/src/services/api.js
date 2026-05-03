@@ -75,8 +75,8 @@ export const paymentsAPI = {
     const response = await api.post('/payments/process', data);
     return response.data;
   },
-  async confirmPayment(appointmentId) {
-    const response = await api.post('/payments/confirm', { appointmentId });
+  async confirmPayment(data) {
+    const response = await api.post('/payments/confirm', data);
     return response.data;
   }
 };

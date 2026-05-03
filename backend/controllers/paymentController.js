@@ -1,5 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Appointment = require('../models/Appointment');
+const Payment = require('../models/Payment');
 
 const processPayment = async (req, res) => {
   try {
@@ -21,13 +22,21 @@ const processPayment = async (req, res) => {
 
 const confirmPayment = async (req, res) => {
   try {
-    const { appointmentId } = req.body;
+    const { appointmentId, transactionId } = req.body;
     const appointment = await Appointment.findByIdAndUpdate(
       appointmentId,
       { paymentStatus: 'paid', status: 'confirmed' },
       { new: true }
     );
     if (appointment) {
+      if (transactionId) {
+        await Payment.create({
+          appointmentId,
+          transactionId,
+          amount: appointment.fee,
+          status: 'succeeded'
+        });
+      }
       res.json(appointment);
     } else {
       res.status(404).json({ message: 'Appointment not found' });
