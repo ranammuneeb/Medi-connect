@@ -15,35 +15,47 @@ const CheckoutForm = ({ appointment, onSuccess }) => {
   const [error, setError] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [clientSecret, setClientSecret] = useState('');
+  const [stripeNotConfigured, setStripeNotConfigured] = useState(false);
 
   useEffect(() => {
-    // Create PaymentIntent as soon as the component loads
     paymentsAPI.processPayment({
       appointmentId: appointment._id,
       amount: appointment.fee,
     }).then(res => {
       setClientSecret(res.clientSecret);
     }).catch(err => {
-      setError('Failed to initialize payment.');
+      const msg = err?.response?.data?.message || '';
+      if (msg === 'STRIPE_NOT_CONFIGURED') {
+        setStripeNotConfigured(true);
+      } else {
+        setError('Failed to initialize payment. Check your Stripe keys.');
+      }
     });
   }, [appointment]);
 
+  // Allow bypassing Stripe (mark as confirmed manually) — useful when Stripe not configured
+  const handleBypassPayment = async () => {
+    setProcessing(true);
+    try {
+      await paymentsAPI.confirmPayment({ appointmentId: appointment._id, transactionId: `manual-${Date.now()}` });
+      onSuccess(`manual-${Date.now()}`);
+    } catch {
+      setError('Failed to confirm appointment.');
+    } finally {
+      setProcessing(false);
+    }
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    if (!stripe || !elements || !clientSecret) {
-      return;
-    }
-
+    if (!stripe || !elements || !clientSecret) return;
     setProcessing(true);
     setError(null);
 
     const payload = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
         card: elements.getElement(CardElement),
-        billing_details: {
-          name: appointment.patientName,
-        },
+        billing_details: { name: appointment.patientName },
       },
     });
 
@@ -51,17 +63,38 @@ const CheckoutForm = ({ appointment, onSuccess }) => {
       setError(`Payment failed: ${payload.error.message}`);
       setProcessing(false);
     } else {
-      // Payment succeeded!
       try {
         await paymentsAPI.confirmPayment({ appointmentId: appointment._id, transactionId: payload.paymentIntent.id });
         setProcessing(false);
         onSuccess(payload.paymentIntent.id);
-      } catch (err) {
-        setError('Payment confirmed but failed to update appointment. Please contact support.');
+      } catch {
+        setError('Payment confirmed but failed to update appointment.');
         setProcessing(false);
       }
     }
   };
+
+  // Show Stripe setup instructions if key is missing
+  if (stripeNotConfigured) {
+    return (
+      <div>
+        <div style={{ background: '#fef3c7', border: '1px solid #fcd34d', borderRadius: 10, padding: '16px', marginBottom: 16, fontSize: '0.85rem', color: '#92400e' }}>
+          <strong>⚠️ Stripe is not configured yet.</strong><br />
+          To enable real payments, add your keys:<br /><br />
+          <strong>1.</strong> Go to <a href="https://dashboard.stripe.com/test/apikeys" target="_blank" rel="noreferrer">dashboard.stripe.com</a><br />
+          <strong>2.</strong> Copy your <code>sk_test_...</code> key → paste into <code>backend/.env</code> as <code>STRIPE_SECRET_KEY</code><br />
+          <strong>3.</strong> Copy your <code>pk_test_...</code> key → paste into <code>mediconnect/.env</code> as <code>VITE_STRIPE_PUBLISHABLE_KEY</code><br />
+          <strong>4.</strong> Restart both servers.<br /><br />
+          <em>In the meantime, you can confirm this appointment without payment:</em>
+        </div>
+        {error && <div style={{ color: '#ef4444', marginBottom: 12, fontSize: '0.85rem' }}>{error}</div>}
+        <button className="btn-primary" style={{ width: '100%' }} onClick={handleBypassPayment} disabled={processing}>
+          {processing ? 'Confirming...' : 'Confirm Appointment (Skip Payment)'}
+        </button>
+      </div>
+    );
+  }
+
 
   return (
     <form onSubmit={handleSubmit}>

@@ -59,7 +59,7 @@ export default function DoctorAppointmentsPage() {
             onChange={(e) => setStatusFilter(e.target.value)}
           >
             <option value="">All Status</option>
-            {statusOptions.map((s) => <option key={s}>{s}</option>)}
+            {DOCTOR_STATUS_OPTIONS.map((s) => <option key={s}>{s}</option>)}
           </select>
         </div>
 

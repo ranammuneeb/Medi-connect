@@ -8,7 +8,7 @@ const getDoctors = async (req, res) => {
     if (specialty) query.specialty = specialty;
     if (location) query.location = location;
 
-    const doctors = await Doctor.find(query);
+    const doctors = await Doctor.find(query).sort({ createdAt: -1 });
     res.json(doctors);
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -24,10 +24,10 @@ export default function AdminDashboardPage() {
   ] : [];
 
   const pieData = stats ? [
-    { name: 'Confirmed', value: stats.appointmentsByStatus.confirmed },
-    { name: 'Pending', value: stats.appointmentsByStatus.pending },
-    { name: 'Completed', value: stats.appointmentsByStatus.completed },
-    { name: 'Cancelled', value: stats.appointmentsByStatus.cancelled },
+    { name: 'Confirmed', value: stats.appointmentsByStatus?.confirmed || 0 },
+    { name: 'Pending', value: stats.appointmentsByStatus?.pending || 0 },
+    { name: 'Completed', value: stats.appointmentsByStatus?.completed || 0 },
+    { name: 'Cancelled', value: stats.appointmentsByStatus?.cancelled || 0 },
   ] : [];
 
   return (

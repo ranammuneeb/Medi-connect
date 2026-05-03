@@ -1,11 +1,25 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PatientNavbar from '../../components/common/PatientNavbar';
-import { assets, specialityData, doctors } from '../../assets/assets';
+import { assets, specialityData } from '../../assets/assets';
+import { doctorsAPI } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
+
+// Generate a coloured initials avatar URL
+function initialsAvatar(name) {
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'D')}&background=5f6fff&color=fff&size=128&bold=true`;
+}
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const [topDoctors, setTopDoctors] = useState([]);
 
-  const topDoctors = doctors.slice(0, 10);
+  useEffect(() => {
+    doctorsAPI.getAll()
+      .then((data) => setTopDoctors(data.slice(0, 10)))
+      .catch(() => setTopDoctors([]));
+  }, []);
 
   return (
     <div>
@@ -59,40 +73,49 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── Top Doctors ───────────────────────────────────────────────────── */}
+      {/* ── Top Doctors — loaded from real API ───────────────────────────── */}
       <div className="py-5 px-4 text-center" style={{ background: '#f9fafb' }}>
         <p className="h4 fw-bold">Top Doctors to Book</p>
         <p className="text-muted mx-auto mb-4" style={{ maxWidth: 480 }}>
           Simply browse through our extensive list of trusted doctors.
         </p>
-        <div className="doctors-grid">
-          {topDoctors.map((doc) => (
-            <div
-              key={doc._id}
-              className="doctor-card"
-              onClick={() => navigate(`/patient/doctors/${doc._id}`)}
-            >
-              <img
-                src={doc.image}
-                alt={doc.name}
-                className="doctor-card-img"
-              />
-              <div className="doctor-card-body">
-                <div className="available-dot">Available</div>
-                <div className="doctor-card-name">{doc.name}</div>
-                <div className="doctor-card-specialty">{doc.speciality}</div>
+
+        {topDoctors.length === 0 ? (
+          <div style={{ color: '#9ca3af', fontSize: '0.9rem', padding: '32px 0' }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: 10 }}>👨‍⚕️</div>
+            <p>No doctors registered yet. <br />Sign up as a doctor to appear here.</p>
+          </div>
+        ) : (
+          <div className="doctors-grid">
+            {topDoctors.map((doc) => (
+              <div
+                key={doc._id}
+                className="doctor-card"
+                onClick={() => navigate(`/patient/doctors/${doc._id}`)}
+              >
+                <img
+                  src={doc.avatar || initialsAvatar(doc.name)}
+                  alt={doc.name}
+                  className="doctor-card-img"
+                />
+                <div className="doctor-card-body">
+                  <div className="available-dot">Available</div>
+                  <div className="doctor-card-name">{doc.name}</div>
+                  <div className="doctor-card-specialty">{doc.specialty}</div>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
+
         <div className="text-center mt-4">
           <button className="btn btn-outline-primary rounded-pill" style={{ borderColor: '#5f6fff', color: '#5f6fff' }} onClick={() => navigate('/patient/doctors')}>
-            more
+            View all doctors
           </button>
         </div>
       </div>
 
-      {/* ── Banner ────────────────────────────────────────────────────────── */}
+      {/* ── Banner — hide "Create account" button when already logged in ──── */}
       <div style={{
         background: 'linear-gradient(135deg, #5f6fff 0%, #8b9bff 100%)',
         margin: '0 40px 60px',
@@ -108,13 +131,25 @@ export default function HomePage() {
           <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: 12, lineHeight: 1.2 }}>
             Book Appointment<br />With 100+ Trusted Doctors on MediConnect
           </h2>
-          <button
-            className="btn rounded-pill"
-            style={{ background: '#fff', color: '#5f6fff', border: 'none' }}
-            onClick={() => navigate('/patient/doctors')}
-          >
-            Create account
-          </button>
+          {/* Only show "Create account" if user is NOT logged in */}
+          {!user && (
+            <button
+              className="btn rounded-pill"
+              style={{ background: '#fff', color: '#5f6fff', border: 'none' }}
+              onClick={() => navigate('/auth/login')}
+            >
+              Create account
+            </button>
+          )}
+          {user && (
+            <button
+              className="btn rounded-pill"
+              style={{ background: '#fff', color: '#5f6fff', border: 'none' }}
+              onClick={() => navigate('/patient/doctors')}
+            >
+              Browse Doctors →
+            </button>
+          )}
         </div>
         <img
           src={assets.appointment_img}
@@ -128,11 +163,7 @@ export default function HomePage() {
         <div className="footer-grid">
           <div>
             <div className="footer-brand">
-              <img
-                src={assets.logo}
-                alt="MediConnect"
-                style={{ height: 44, width:300, display: 'block' }}
-              />
+              <img src={assets.logo} alt="MediConnect" style={{ height: 44, width: 300, display: 'block' }} />
             </div>
             <p className="footer-desc">
               Your trusted platform for booking appointments with top doctors.

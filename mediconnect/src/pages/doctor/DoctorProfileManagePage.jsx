@@ -106,7 +106,7 @@ export default function DoctorProfileManagePage() {
             <div className="card-body d-flex align-items-center gap-4">
               <div style={{ position: 'relative' }}>
                 <img
-                  src={avatarUrl || `https://randomuser.me/api/portraits/men/1.jpg`}
+                  src={avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'D')}&background=5f6fff&color=fff&size=128&bold=true`}
                   alt="Profile"
                   style={{ width: 90, height: 90, borderRadius: '50%', objectFit: 'cover', border: '3px solid #eef0ff' }}
                 />

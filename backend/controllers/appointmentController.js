@@ -35,9 +35,9 @@ const updateAppointmentStatus = async (req, res) => {
     const { status } = req.body;
     const userRole = req.user.role;
 
-    // Patients cannot change appointment status
-    if (userRole === 'patient') {
-      return res.status(403).json({ message: 'Patients are not allowed to change appointment status' });
+    // Patients can only cancel their own appointments
+    if (userRole === 'patient' && status !== 'cancelled') {
+      return res.status(403).json({ message: 'Patients can only cancel appointments' });
     }
 
     // Doctors can only set confirmed or completed — not cancel

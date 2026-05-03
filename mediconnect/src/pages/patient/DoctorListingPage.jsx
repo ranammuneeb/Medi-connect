@@ -5,6 +5,9 @@ import LandingNavbar from '../../components/common/LandingNavbar';
 import { useAuth } from '../../context/AuthContext';
 import { doctorsAPI, specialties } from '../../services/api';
 
+const initialsAvatar = (name) =>
+  `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'D')}&background=5f6fff&color=fff&size=128&bold=true`;
+
 export default function DoctorListingPage() {
   const [searchParams] = useSearchParams();
   const [selectedSpeciality, setSelectedSpeciality] = useState(searchParams.get('speciality') || '');
@@ -95,7 +98,7 @@ export default function DoctorListingPage() {
                   onClick={() => navigate(user ? `/patient/doctors/${doc._id}` : `/all-doctors/${doc._id}`)}
                 >
                   <img
-                    src={doc.avatar || `https://randomuser.me/api/portraits/men/1.jpg`}
+                    src={doc.avatar || initialsAvatar(doc.name)}
                     alt={doc.name}
                     className="doctor-card-img"
                   />
