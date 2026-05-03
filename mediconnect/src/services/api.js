@@ -7,9 +7,14 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const user = JSON.parse(localStorage.getItem('mediconnect_user'));
-  if (user && user.token) {
-    config.headers.Authorization = `Bearer ${user.token}`;
+  const userStr = localStorage.getItem('mediconnect_user');
+  if (userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      if (user && user.token && user.token !== 'undefined' && user.token !== 'null') {
+        config.headers.Authorization = `Bearer ${user.token}`;
+      }
+    } catch (err) {}
   }
   return config;
 });
