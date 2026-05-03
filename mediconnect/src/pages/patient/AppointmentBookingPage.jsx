@@ -5,7 +5,7 @@ import { assets } from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
 import { appointmentsAPI, doctorsAPI } from '../../services/api';
 
-// Map a JS Date's getDay() number to full weekday name matching the doctor's availability keys
+
 const DAY_NUMBER_TO_NAME = {
   0: 'Sunday', 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday',
   4: 'Thursday', 5: 'Friday', 6: 'Saturday',
@@ -17,12 +17,12 @@ function getNextDays() {
   let d = new Date();
   d.setDate(d.getDate() + 1);
   while (days.length < 7) {
-    if (d.getDay() !== 0) { // skip Sunday
+    if (d.getDay() !== 0) {
       days.push({
         label: dayNames[d.getDay()],
         date: d.getDate(),
         fullDate: d.toISOString().split('T')[0],
-        dayNumber: d.getDay(), // keep the numeric day for availability lookup
+        dayNumber: d.getDay(),
       });
     }
     d.setDate(d.getDate() + 1);
@@ -58,20 +58,20 @@ export default function AppointmentBookingPage() {
       .finally(() => setLoadingDoctor(false));
   }, [doctorId]);
 
-  // When the day selection changes, clear time selection
+
   const handleDaySelect = (i) => {
     setSelectedDay(i);
     setSelectedTime('');
   };
 
-  // Get the available slots for the currently selected day
+
   const getAvailableSlotsForDay = () => {
     if (!doctor || !doctor.availability) return [];
     const dayName = DAY_NUMBER_TO_NAME[days[selectedDay].dayNumber];
     return doctor.availability[dayName] || [];
   };
 
-  // Check if a day has any available slots (used to visually mark days)
+
   const dayHasSlots = (dayObj) => {
     if (!doctor || !doctor.availability) return false;
     const dayName = DAY_NUMBER_TO_NAME[dayObj.dayNumber];
@@ -130,7 +130,7 @@ export default function AppointmentBookingPage() {
       <PatientNavbar />
       <div className="booking-page" style={{ maxWidth: 900, margin: '40px auto', padding: '0 20px' }}>
 
-        {/* Doctor info row */}
+        {}
         <div style={{ display: 'flex', gap: 20, alignItems: 'flex-start', padding: 24, border: '1px solid #e5e7eb', borderRadius: 12, marginBottom: 32, background: '#fff' }}>
           {doctor.avatar ? (
             <img src={doctor.avatar} alt={doctor.name} style={{ width: 100, height: 100, borderRadius: 10, objectFit: 'cover', flexShrink: 0 }} />
@@ -167,11 +167,11 @@ export default function AppointmentBookingPage() {
           </div>
         </div>
 
-        {/* Slot selector */}
+        {}
         <div className="slot-section">
           <h3>Booking slots</h3>
 
-          {/* Day selector — show dot indicator if day has availability */}
+          {}
           <div className="day-slots">
             {days.map((day, i) => {
               const hasSlots = dayHasSlots(day);
@@ -197,7 +197,7 @@ export default function AppointmentBookingPage() {
             })}
           </div>
 
-          {/* Time slots — only show the doctor's set slots for this day */}
+          {}
           {availableSlots.length === 0 ? (
             <div style={{
               padding: '24px 20px', background: '#f9fafb', borderRadius: 10,

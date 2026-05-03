@@ -5,7 +5,7 @@ import { assets, specialityData } from '../../assets/assets';
 import { doctorsAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
-// Generate a coloured initials avatar URL
+
 function initialsAvatar(name) {
   return `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'D')}&background=5f6fff&color=fff&size=128&bold=true`;
 }
@@ -25,7 +25,7 @@ export default function HomePage() {
     <div>
       <PatientNavbar />
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      {}
       <div className="hero">
         <div className="hero-text">
           <div className="hero-badges">
@@ -52,7 +52,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── Speciality ────────────────────────────────────────────────────── */}
+      {}
       <div className="py-5 px-4 text-center" id="speciality">
         <p className="h4 fw-bold">Find by Speciality</p>
         <p className="text-muted mx-auto mb-4" style={{ maxWidth: 480 }}>
@@ -73,7 +73,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── Top Doctors — loaded from real API ───────────────────────────── */}
+      {}
       <div className="py-5 px-4 text-center" style={{ background: '#f9fafb' }}>
         <p className="h4 fw-bold">Top Doctors to Book</p>
         <p className="text-muted mx-auto mb-4" style={{ maxWidth: 480 }}>
@@ -115,7 +115,7 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* ── Banner — hide "Create account" button when already logged in ──── */}
+      {}
       <div style={{
         background: 'linear-gradient(135deg, #5f6fff 0%, #8b9bff 100%)',
         margin: '0 40px 60px',
@@ -131,7 +131,7 @@ export default function HomePage() {
           <h2 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: 12, lineHeight: 1.2 }}>
             Book Appointment<br />With 100+ Trusted Doctors on MediConnect
           </h2>
-          {/* Only show "Create account" if user is NOT logged in */}
+          {}
           {!user && (
             <button
               className="btn rounded-pill"
@@ -158,7 +158,7 @@ export default function HomePage() {
         />
       </div>
 
-      {/* ── Footer ────────────────────────────────────────────────────────── */}
+      {}
       <footer className="footer">
         <div className="footer-grid">
           <div>

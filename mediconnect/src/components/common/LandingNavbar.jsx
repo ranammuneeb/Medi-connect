@@ -12,12 +12,12 @@ export default function LandingNavbar() {
     <>
       <nav className="navbar navbar-expand-lg navbar-light bg-white border-bottom sticky-top">
         <div className="container">
-          {/* Brand */}
+          {}
           <Link to="/landing" className="navbar-brand">
             <img src={assets.logo} alt="MediConnect" style={{ height: 36 }} />
           </Link>
 
-          {/* Nav Links — centered */}
+          {}
           <ul className="navbar-nav mx-auto d-none d-lg-flex flex-row gap-4">
             <li className="nav-item">
               <Link to="/landing" className={`nav-link${isActive('/landing') ? ' active fw-semibold' : ''}`} style={isActive('/landing') ? { color: '#5f6fff' } : {}}>HOME</Link>
@@ -33,7 +33,7 @@ export default function LandingNavbar() {
             </li>
           </ul>
 
-          {/* Right side */}
+          {}
           <div className="d-flex align-items-center gap-2">
             <Link to="/auth/login" className="btn rounded-pill d-none d-lg-inline-block" style={{ background: '#5f6fff', color: '#fff', border: 'none' }}>Create account</Link>
             <button className="menu-icon-btn d-lg-none" onClick={() => setMobileOpen(true)}>
@@ -43,7 +43,7 @@ export default function LandingNavbar() {
         </div>
       </nav>
 
-      {/* Mobile nav */}
+      {}
       {mobileOpen && (
         <div className="mobile-nav open">
           <button className="mobile-nav-close" onClick={() => setMobileOpen(false)}>

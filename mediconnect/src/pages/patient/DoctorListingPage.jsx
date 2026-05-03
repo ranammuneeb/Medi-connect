@@ -17,7 +17,7 @@ export default function DoctorListingPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Fetch all doctors from the real backend
+
   useEffect(() => {
     setLoading(true);
     doctorsAPI.getAll()
@@ -29,7 +29,7 @@ export default function DoctorListingPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  // Filter whenever specialty selection changes
+
   useEffect(() => {
     if (selectedSpeciality) {
       setFilteredDoctors(allDoctors.filter((d) => d.specialty === selectedSpeciality));
@@ -54,7 +54,7 @@ export default function DoctorListingPage() {
       </div>
 
       <div className="listing-layout">
-        {/* Sidebar */}
+        {}
         <div className="listing-sidebar">
           <h3>Filters</h3>
           {specialties.map((spec) => (
@@ -77,7 +77,7 @@ export default function DoctorListingPage() {
           )}
         </div>
 
-        {/* Doctor grid */}
+        {}
         <div className="listing-content">
           <p className="text-muted mb-4" style={{ fontSize: '0.9rem' }}>
             {loading ? 'Loading doctors...' : `${filteredDoctors.length} doctor${filteredDoctors.length !== 1 ? 's' : ''} found${selectedSpeciality ? ` for "${selectedSpeciality}"` : ''}`}

@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(getStoredUser);
 
   const login = useCallback((userData) => {
-    // Store user exactly as received from the API (contains real JWT token)
+
     localStorage.setItem(STORAGE_KEY, JSON.stringify(userData));
     setUser(userData);
   }, []);

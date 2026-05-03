@@ -51,5 +51,5 @@ export const specialityData = [
     { speciality: 'Gastroenterologist', image: Gastroenterologist },
 ]
 
-// All doctors are now loaded from MongoDB via the API — no static dummy data.
+
 export const doctors = []

@@ -2,18 +2,18 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
-// Auth Pages
+
 import LoginRegisterPage from './pages/auth/LoginRegisterPage';
 import AdminLoginPage from './pages/auth/AdminLoginPage';
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
 import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 
-// Public Pages
+
 import LandingPage from './pages/public/LandingPage';
 import PublicAboutPage from './pages/public/PublicAboutPage';
 import PublicContactPage from './pages/public/PublicContactPage';
 
-// Patient Pages
+
 import HomePage from './pages/patient/HomePage';
 import DoctorListingPage from './pages/patient/DoctorListingPage';
 import DoctorProfilePage from './pages/patient/DoctorProfilePage';
@@ -22,12 +22,12 @@ import MyAppointmentsPage from './pages/patient/MyAppointmentsPage';
 import PatientProfilePage from './pages/patient/PatientProfilePage';
 import PaymentPage from './pages/patient/PaymentPage';
 
-// Admin Pages
+
 import AdminDashboardPage from './pages/admin/AdminDashboardPage';
 import ManageDoctorsPage from './pages/admin/ManageDoctorsPage';
 import AppointmentsOverviewPage from './pages/admin/AppointmentsOverviewPage';
 
-// Doctor Pages
+
 import DoctorDashboardPage from './pages/doctor/DoctorDashboardPage';
 import DoctorAppointmentsPage from './pages/doctor/DoctorAppointmentsPage';
 import DoctorProfileManagePage from './pages/doctor/DoctorProfileManagePage';
@@ -43,17 +43,17 @@ function RootRedirect() {
 export default function App() {
   return (
     <Routes>
-      {/* Root */}
+      {}
       <Route path="/" element={<RootRedirect />} />
 
-      {/* Public routes (no login required) */}
+      {}
       <Route path="/landing" element={<LandingPage />} />
       <Route path="/about" element={<PublicAboutPage />} />
       <Route path="/contact" element={<PublicContactPage />} />
       <Route path="/all-doctors" element={<DoctorListingPage />} />
       <Route path="/all-doctors/:id" element={<DoctorProfilePage />} />
 
-      {/* Auth */}
+      {}
       <Route path="/login" element={<LoginRegisterPage />} />
       <Route path="/auth/login" element={<LoginRegisterPage />} />
       <Route path="/auth/register" element={<LoginRegisterPage />} />
@@ -61,47 +61,10 @@ export default function App() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
 
-      {/* Patient Routes (login required) */}
-      <Route path="/patient/*" element={
-        <ProtectedRoute allowedRoles={['patient']}>
-          <Routes>
-            <Route path="home" element={<HomePage />} />
-            <Route path="doctors" element={<DoctorListingPage />} />
-            <Route path="doctors/:id" element={<DoctorProfilePage />} />
-            <Route path="book/:doctorId" element={<AppointmentBookingPage />} />
-            <Route path="payment/:appointmentId" element={<PaymentPage />} />
-            <Route path="appointments" element={<MyAppointmentsPage />} />
-            <Route path="profile" element={<PatientProfilePage />} />
-            <Route path="*" element={<Navigate to="home" replace />} />
-          </Routes>
-        </ProtectedRoute>
-      } />
-
-      {/* Admin Routes */}
-      <Route path="/admin/*" element={
-        <ProtectedRoute allowedRoles={['admin']}>
-          <Routes>
-            <Route path="dashboard" element={<AdminDashboardPage />} />
-            <Route path="doctors" element={<ManageDoctorsPage />} />
-            <Route path="appointments" element={<AppointmentsOverviewPage />} />
-            <Route path="*" element={<Navigate to="dashboard" replace />} />
-          </Routes>
-        </ProtectedRoute>
-      } />
-
-      {/* Doctor Routes */}
-      <Route path="/doctor/*" element={
-        <ProtectedRoute allowedRoles={['doctor']}>
-          <Routes>
-            <Route path="dashboard" element={<DoctorDashboardPage />} />
-            <Route path="appointments" element={<DoctorAppointmentsPage />} />
-            <Route path="profile" element={<DoctorProfileManagePage />} />
-            <Route path="*" element={<Navigate to="dashboard" replace />} />
-          </Routes>
-        </ProtectedRoute>
-      } />
-
-      {/* Catch-all */}
+      {}
+      <Route path="/patient}
+      <Route path="/admin}
+      <Route path="/doctor}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

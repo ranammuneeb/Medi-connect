@@ -3,7 +3,7 @@ import DoctorSidebar from '../../components/doctor/DoctorSidebar';
 import { appointmentsAPI } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
-// Doctors may only mark appointments as in-progress, completed or cancelled
+
 const DOCTOR_STATUS_OPTIONS = ['in-progress', 'completed', 'cancelled'];
 const statusClass = { confirmed: 'status-confirmed', pending: 'status-pending', 'in-progress': 'status-in-progress', cancelled: 'status-cancelled', completed: 'status-completed' };
 
@@ -43,7 +43,7 @@ export default function DoctorAppointmentsPage() {
           <p className="text-muted" style={{ fontSize: '0.88rem' }}>{appointments.length} total appointments</p>
         </div>
 
-        {/* Filters */}
+        {}
         <div className="d-flex gap-3 mb-3 flex-wrap">
           <input
             className="form-control"
@@ -63,7 +63,7 @@ export default function DoctorAppointmentsPage() {
           </select>
         </div>
 
-        {/* Table */}
+        {}
         <div className="card shadow-sm border-0">
           <div className="card-body p-0">
             <div className="table-responsive">

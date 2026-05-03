@@ -6,7 +6,7 @@ export default function ContactPage() {
     <div>
       <PatientNavbar />
 
-      {/* ── Contact ───────────────────────────────────────────────────────── */}
+      {}
       <div className="section">
         <p className="section-title" style={{ textAlign: 'center' }}>
           CONTACT <span>US</span>
@@ -41,7 +41,7 @@ export default function ContactPage() {
         </div>
       </div>
 
-      {/* ── Footer ────────────────────────────────────────────────────────── */}
+      {}
       <footer className="footer">
         <div className="footer-grid">
           <div>

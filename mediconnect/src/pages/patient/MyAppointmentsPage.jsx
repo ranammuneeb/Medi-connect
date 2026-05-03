@@ -13,7 +13,7 @@ export default function MyAppointmentsPage() {
   const fetchAppointments = async () => {
     setLoading(true);
     try {
-      // Use user._id (the real MongoDB ID from the backend)
+
       const data = await appointmentsAPI.getAll({ patientId: user?._id });
       setAppointments(data);
     } catch {
@@ -71,7 +71,7 @@ export default function MyAppointmentsPage() {
             const isUpcoming = (appt.status === 'confirmed' || appt.status === 'pending') && apptDate >= now;
             return (
               <div key={appt._id} className="appt-card">
-                {/* Doctor image */}
+                {}
                 <div style={{ flexShrink: 0 }}>
                   <img 
                     src={appt.doctorAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(appt.doctorName)}&background=5f6fff&color=fff&size=128&bold=true`} 
@@ -80,7 +80,7 @@ export default function MyAppointmentsPage() {
                   />
                 </div>
 
-                {/* Info */}
+                {}
                 <div style={{ flex: 1 }}>
                   <div className="fw-semibold" style={{ fontSize: '0.95rem', marginBottom: 3 }}>{appt.doctorName}</div>
                   <div className="text-muted" style={{ fontSize: '0.82rem' }}>{appt.specialty}</div>
@@ -92,7 +92,7 @@ export default function MyAppointmentsPage() {
                   </div>
                 </div>
 
-                {/* Actions */}
+                {}
                 <div className="d-flex flex-column gap-2 align-items-end">
                   <span className={`status-badge ${statusClass[appt.status] || 'status-pending'}`}>
                     {appt.status}

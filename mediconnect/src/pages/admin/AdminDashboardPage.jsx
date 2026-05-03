@@ -41,7 +41,7 @@ export default function AdminDashboardPage() {
           </p>
         </div>
 
-        {/* Stat Cards */}
+        {}
         <div className="row g-3 mb-4">
           {stats ? statCards.map((card) => (
             <div key={card.label} className="col-6 col-xl-3">
@@ -66,7 +66,7 @@ export default function AdminDashboardPage() {
           )}
         </div>
 
-        {/* Charts row */}
+        {}
         <div className="row g-3 mb-3">
           <div className="col-12 col-lg-8">
             <div className="card shadow-sm border-0">

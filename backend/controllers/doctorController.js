@@ -68,7 +68,7 @@ const createDoctor = async (req, res) => {
       return res.status(400).json({ message: 'Doctor email already exists' });
     }
 
-    // Create doctor profile
+
     const doctor = await Doctor.create({
       name,
       email,
@@ -84,11 +84,11 @@ const createDoctor = async (req, res) => {
       availability: {},
     });
 
-    // Create user account for the doctor
+
     await User.create({
       name,
       email,
-      password: 'doctor123', // Default password
+      password: 'doctor123',
       role: 'doctor',
       phone,
       avatar,

@@ -58,7 +58,7 @@ export default function DoctorProfilePage() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  // Get available slots for the selected day from doctor's availability
+
   const getAvailableSlots = () => {
     if (!doctor?.availability) return [];
     const dayName = DAY_NUMBER_TO_NAME[days[selectedDay].dayNumber];
@@ -83,7 +83,7 @@ export default function DoctorProfilePage() {
       <Navbar />
 
       <div className="profile-page">
-        {/* Top section */}
+        {}
         <div className="profile-top">
           {doctor.avatar ? (
             <img src={doctor.avatar} alt={doctor.name} className="profile-img" />
@@ -111,11 +111,11 @@ export default function DoctorProfilePage() {
           </div>
         </div>
 
-        {/* Booking slots — only show doctor's available slots */}
+        {}
         <div className="slot-section" style={{ marginBottom: 40 }}>
           <h3>Booking slots</h3>
 
-          {/* Day selector with availability indicator */}
+          {}
           <div className="day-slots">
             {days.map((day, i) => {
               const hasSlots = dayHasSlots(day);
@@ -141,7 +141,7 @@ export default function DoctorProfilePage() {
             })}
           </div>
 
-          {/* Time slots — only the doctor's configured slots */}
+          {}
           {availableSlots.length === 0 ? (
             <div style={{
               padding: '20px', background: '#f9fafb', borderRadius: 10,
@@ -179,7 +179,7 @@ export default function DoctorProfilePage() {
           </button>
         </div>
 
-        {/* Related doctors */}
+        {}
         {relatedDoctors.length > 0 && (
           <div>
             <p className="h5 fw-bold mb-2">Related Doctors</p>

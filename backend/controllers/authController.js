@@ -40,7 +40,7 @@ const register = async (req, res) => {
     }
 
     let doctorId = null;
-    const avatar = ''; // Avatar will be uploaded by the user themselves
+    const avatar = '';
 
     if (role === 'doctor') {
       const doctor = await Doctor.create({
@@ -96,17 +96,17 @@ const forgotPassword = async (req, res) => {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Generate reset token
+
     const resetToken = crypto.randomBytes(20).toString('hex');
     user.resetPasswordToken = resetToken;
-    user.resetPasswordExpire = Date.now() + 3600000; // 1 hour
+    user.resetPasswordExpire = Date.now() + 3600000;
 
     await user.save();
 
-    // In a real app, send email here. For now, we return it in response for dev testing.
+
     res.json({ 
       message: 'Password reset token generated', 
-      resetToken, // RETURNED FOR DEV TESTING
+      resetToken,
       instruction: 'In a production app, this would be sent to your email.'
     });
   } catch (error) {

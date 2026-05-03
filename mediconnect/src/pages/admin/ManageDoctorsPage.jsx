@@ -10,7 +10,7 @@ export default function ManageDoctorsPage() {
   const [editingDoctor, setEditingDoctor] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  // form fields
+
   const [form, setForm] = useState({ name: '', email: '', specialty: '', location: '', experience: '', consultationFee: '', phone: '', education: '', bio: '' });
 
   const fetchDoctors = async () => {
@@ -38,7 +38,7 @@ export default function ManageDoctorsPage() {
     e.preventDefault();
     if (!form.name || !form.email || !form.specialty) { alert('Name, email and specialty are required'); return; }
     
-    // Validation: Phone (digits only)
+
     if (form.phone && !/^\d+$/.test(form.phone)) {
       alert('Phone number must contain only digits');
       return;
@@ -90,7 +90,7 @@ export default function ManageDoctorsPage() {
           <button className="btn-primary" onClick={openAdd}>+ Add Doctor</button>
         </div>
 
-        {/* Search */}
+        {}
         <div className="mb-3">
           <input
             className="form-control"
@@ -101,7 +101,7 @@ export default function ManageDoctorsPage() {
           />
         </div>
 
-        {/* Table */}
+        {}
         <div className="card shadow-sm border-0">
           <div className="card-body p-0">
             <div className="table-responsive">
@@ -155,7 +155,7 @@ export default function ManageDoctorsPage() {
         </div>
       </div>
 
-      {/* Modal */}
+      {}
       {showModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.4)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
           <div className="card shadow" style={{ width: '100%', maxWidth: 560, maxHeight: '90vh', overflowY: 'auto', borderRadius: 16 }}>

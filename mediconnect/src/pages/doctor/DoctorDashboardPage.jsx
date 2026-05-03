@@ -41,7 +41,7 @@ export default function DoctorDashboardPage() {
           </p>
         </div>
 
-        {/* Stats */}
+        {}
         <div className="row g-3 mb-4">
           {stats.map((s) => (
             <div key={s.label} className="col-6 col-xl-3">
@@ -61,7 +61,7 @@ export default function DoctorDashboardPage() {
         </div>
 
         <div className="row g-3 mb-3">
-          {/* Today */}
+          {}
           <div className="col-12 col-lg-6">
             <div className="card shadow-sm border-0">
               <div className="card-body">
@@ -81,7 +81,7 @@ export default function DoctorDashboardPage() {
             </div>
           </div>
 
-          {/* Upcoming */}
+          {}
           <div className="col-12 col-lg-6">
             <div className="card shadow-sm border-0">
               <div className="card-body">
@@ -102,7 +102,7 @@ export default function DoctorDashboardPage() {
           </div>
         </div>
 
-        {/* Chart */}
+        {}
         <div className="card shadow-sm border-0">
           <div className="card-body">
             <h3 className="fw-semibold mb-3" style={{ fontSize: '0.95rem' }}>Weekly Appointment Volume</h3>

@@ -6,7 +6,7 @@ export default function AboutPage() {
     <div>
       <PatientNavbar />
 
-      {/* ── About ─────────────────────────────────────────────────────────── */}
+      {}
       <div className="section">
         <p className="section-title" style={{ textAlign: 'center' }}>
           ABOUT <span>US</span>
@@ -40,7 +40,7 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* ── Why Choose Us ─────────────────────────────────────────────────── */}
+      {}
       <div className="section" style={{ background: '#f9fafb' }}>
         <p style={{ fontWeight: 700, fontSize: '1rem', color: '#2d3748', marginBottom: 24, letterSpacing: 1 }}>
           WHY <span style={{ color: '#5f6fff' }}>CHOOSE US</span>
@@ -87,7 +87,7 @@ export default function AboutPage() {
         </div>
       </div>
 
-      {/* ── Footer ────────────────────────────────────────────────────────── */}
+      {}
       <footer className="footer">
         <div className="footer-grid">
           <div>

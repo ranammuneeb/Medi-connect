@@ -10,7 +10,7 @@ export default function LandingPage() {
     <div>
       <LandingNavbar />
 
-      {/* ── Hero ─────────────────────────────────────────────────────────── */}
+      {}
       <div className="hero-landing">
         <div className="hero-text">
           <div className="hero-badges">
@@ -37,7 +37,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── Speciality ────────────────────────────────────────────────────── */}
+      {}
       <div className="py-5 px-4 text-center" id="speciality">
         <p className="h4 fw-bold">Find by Speciality</p>
         <p className="text-muted mx-auto mb-4" style={{ maxWidth: 480 }}>
@@ -58,7 +58,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── Top Doctors ───────────────────────────────────────────────────── */}
+      {}
       <div className="py-5 px-4 text-center" style={{ background: '#f9fafb' }}>
         <p className="h4 fw-bold">Top Doctors to Book</p>
         <p className="text-muted mx-auto mb-4" style={{ maxWidth: 480 }}>
@@ -87,7 +87,7 @@ export default function LandingPage() {
         </div>
       </div>
 
-      {/* ── Banner ────────────────────────────────────────────────────────── */}
+      {}
       <div style={{
         background: 'linear-gradient(135deg, #5f6fff 0%, #8b9bff 100%)',
         margin: '0 40px 60px',
@@ -118,7 +118,7 @@ export default function LandingPage() {
         />
       </div>
 
-      {/* ── Footer ────────────────────────────────────────────────────────── */}
+      {}
       <footer className="footer">
         <div className="footer-grid">
           <div>

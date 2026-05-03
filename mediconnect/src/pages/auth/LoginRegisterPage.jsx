@@ -6,15 +6,15 @@ import { assets } from '../../assets/assets';
 
 export default function LoginRegisterPage() {
   const [activeTab, setActiveTab] = useState('Login');
-  const [role, setRole] = useState('patient'); // 'patient' | 'doctor'
+  const [role, setRole] = useState('patient');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // login fields
+
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
 
-  // register fields
+
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
@@ -69,7 +69,7 @@ export default function LoginRegisterPage() {
   return (
     <div className="auth-page">
       <div className="auth-card">
-        {/* Logo */}
+        {}
         <div className="text-center mb-4">
           <img src={assets.logo} alt="MediConnect" style={{ height: 40 }} />
         </div>
@@ -77,13 +77,13 @@ export default function LoginRegisterPage() {
         <h2>{activeTab === 'Login' ? 'Login' : 'Create Account'}</h2>
         <p>Please {activeTab === 'Login' ? 'log in' : 'sign up'} to book appointment</p>
 
-        {/* Login / Sign Up tabs */}
+        {}
         <div className="auth-tabs" style={{ marginBottom: 16 }}>
           <button className={`auth-tab ${activeTab === 'Login' ? 'active' : ''}`} onClick={() => switchTab('Login')}>Login</button>
           <button className={`auth-tab ${activeTab === 'Register' ? 'active' : ''}`} onClick={() => switchTab('Register')}>Sign Up</button>
         </div>
 
-        {/* Patient / Doctor role toggle */}
+        {}
         <div className="d-flex gap-2 mb-3">
           <button
             onClick={() => switchRole('patient')}
@@ -152,7 +152,7 @@ export default function LoginRegisterPage() {
               <label className="form-label">Password</label>
               <input className="form-control" type="password" placeholder="Min 6 characters" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} />
             </div>
-            {/* Show specialty field only when signing up as a doctor */}
+            {}
             {role === 'doctor' && (
               <div className="mb-3">
                 <label className="form-label">Specialty</label>

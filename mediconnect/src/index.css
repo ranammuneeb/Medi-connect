@@ -1,4 +1,4 @@
-/* ─── Design System Variables ─────────────────────────────────────────────── */
+
 :root {
   --primary: #5f6fff;
   --primary-dark: #4a58e0;
@@ -21,7 +21,7 @@ body {
   line-height: 1.6;
 }
 
-/* ─── Avatar dropdown (React-state driven, not Bootstrap JS) ──────────────── */
+
 .avatar-menu {
   position: relative;
 }
@@ -82,7 +82,7 @@ body {
   margin: 4px 0;
 }
 
-/* ─── Mobile nav overlay ──────────────────────────────────────────────────── */
+
 .menu-icon-btn {
   display: none;
   background: none;
@@ -123,7 +123,7 @@ body {
   .menu-icon-btn { display: block; }
 }
 
-/* ─── Hero Section (logged-in patient) ───────────────────────────────────── */
+
 .hero {
   background: linear-gradient(135deg, #eef0ff 0%, #e8f4ff 100%);
   padding: 60px 40px;
@@ -150,7 +150,7 @@ body {
   max-width: 420px;
 }
 
-/* ─── Hero Section (public landing) ──────────────────────────────────────── */
+
 .hero-landing {
   background: linear-gradient(120deg, #5f6fff 0%, #7b8cff 100%);
   padding: 60px 60px 0;
@@ -181,7 +181,7 @@ body {
   gap: 12px;
   margin-bottom: 28px;
 }
-/* light hero badge (logged-in) */
+
 .hero .hero-badge {
   background: #fff;
   border-radius: 50px;
@@ -194,7 +194,7 @@ body {
   align-items: center;
   gap: 6px;
 }
-/* blue hero badge (public landing) */
+
 .hero-landing .hero-badge {
   background: rgba(255,255,255,0.18);
   border-radius: 50px;
@@ -206,10 +206,10 @@ body {
   align-items: center;
   gap: 6px;
 }
-/* light hero image */
+
 .hero .hero-image { flex: 1; display: flex; justify-content: flex-end; max-width: 480px; }
 .hero .hero-image img { width: 100%; max-width: 440px; border-radius: 20px; }
-/* landing hero image (sits at bottom) */
+
 .hero-landing .hero-image {
   flex: 1;
   display: flex;
@@ -225,7 +225,7 @@ body {
   display: block;
 }
 
-/* ─── Speciality Grid ────────────────────────────────────────────────────── */
+
 .speciality-grid {
   display: flex !important;
   flex-wrap: wrap;
@@ -234,14 +234,14 @@ body {
   padding-bottom: 8px;
 }
 
-/* ─── Doctors Grid ────────────────────────────────────────────────────────── */
+
 .doctors-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 20px;
 }
 
-/* ─── Speciality Cards ────────────────────────────────────────────────────── */
+
 .speciality-card {
   flex-shrink: 0;
   display: flex;
@@ -270,7 +270,7 @@ body {
   color: var(--text-dark);
 }
 
-/* ─── Doctor Cards ────────────────────────────────────────────────────────── */
+
 .doctor-card {
   background: #fff;
   border: 1px solid var(--border);
@@ -317,7 +317,7 @@ body {
   color: var(--text-gray);
 }
 
-/* ─── Doctor Listing Page ─────────────────────────────────────────────────── */
+
 .listing-layout {
   display: flex;
   min-height: calc(100vh - 72px);
@@ -357,7 +357,7 @@ body {
 }
 .listing-content { flex: 1; padding: 24px; }
 
-/* ─── Doctor Profile Page ─────────────────────────────────────────────────── */
+
 .profile-page { padding: 40px; max-width: 1000px; margin: 0 auto; }
 .profile-top {
   display: flex;
@@ -418,7 +418,7 @@ body {
 }
 .fee-row strong { color: var(--text-dark); }
 
-/* ─── Booking Slots ───────────────────────────────────────────────────────── */
+
 .slot-section h3 {
   font-size: 1rem;
   font-weight: 600;
@@ -475,7 +475,7 @@ body {
   margin-bottom: 28px;
 }
 
-/* ─── Auth Pages ──────────────────────────────────────────────────────────── */
+
 .auth-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #eef0ff 0%, #e8f4ff 100%);
@@ -534,7 +534,7 @@ body {
 }
 .demo-box strong { display: block; margin-bottom: 4px; }
 
-/* ─── Admin / Doctor Sidebars ─────────────────────────────────────────────── */
+
 .admin-layout, .doctor-layout {
   display: flex;
   min-height: 100vh;
@@ -596,7 +596,7 @@ body {
   background: var(--bg);
 }
 
-/* ─── Appointment Cards ───────────────────────────────────────────────────── */
+
 .appt-card {
   display: flex;
   align-items: center;
@@ -608,7 +608,7 @@ body {
   margin-bottom: 12px;
 }
 
-/* ─── Status Badges ───────────────────────────────────────────────────────── */
+
 .status-badge {
   display: inline-block;
   padding: 3px 10px;
@@ -623,7 +623,7 @@ body {
 .status-in-progress { background: #e0f2fe; color: #0369a1; }
 .status-completed { background: #dbeafe; color: #1e40af; }
 
-/* ─── Alerts ──────────────────────────────────────────────────────────────── */
+
 .alert {
   border-radius: 8px;
   margin-bottom: 16px;
@@ -640,7 +640,7 @@ body {
   color: #15803d;
 }
 
-/* ─── Footer ──────────────────────────────────────────────────────────────── */
+
 .footer {
   background: var(--text-dark);
   color: rgba(255,255,255,0.7);
@@ -684,7 +684,7 @@ body {
   font-size: 0.82rem;
 }
 
-/* ─── Buttons ─────────────────────────────────────────────────────────────── */
+
 .btn-primary {
   background: var(--primary);
   color: #fff;
@@ -716,7 +716,7 @@ body {
 }
 .btn-outline:hover { border-color: var(--primary); color: var(--primary); }
 
-/* ─── Misc Utilities ──────────────────────────────────────────────────────── */
+
 .cursor-pointer { cursor: pointer; }
 .skeleton {
   background: linear-gradient(90deg, #f0f0f0 25%, #e8e8e8 50%, #f0f0f0 75%);
@@ -729,7 +729,7 @@ body {
   100% { background-position:  200% 0; }
 }
 
-/* ─── Responsive ──────────────────────────────────────────────────────────── */
+
 @media (max-width: 768px) {
   .hero { flex-direction: column; padding: 40px 20px; min-height: auto; }
   .hero-image { display: none; }

@@ -19,7 +19,7 @@ export default function PatientProfilePage() {
   const [dob, setDob] = useState(user?.dob || '');
   const [avatarUrl, setAvatarUrl] = useState(user?.avatar || '');
 
-  // Generate initials avatar as fallback
+
   const initialsAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=5f6fff&color=fff&size=128`;
 
   const handleAvatarChange = async (e) => {
@@ -36,7 +36,7 @@ export default function PatientProfilePage() {
       const data = await res.json();
       if (data.url) {
         setAvatarUrl(data.url);
-        // Immediately persist avatar to local user state
+
         updateUser({ avatar: data.url });
       } else {
         alert('Upload failed. Please try again.');
@@ -61,7 +61,7 @@ export default function PatientProfilePage() {
       <PatientNavbar />
 
       <div className="px-4 py-4" style={{ maxWidth: 800, margin: '0 auto' }}>
-        {/* Avatar + name */}
+        {}
         <div className="d-flex align-items-end gap-3 mb-4">
           <div style={{ position: 'relative' }}>
             <img
@@ -69,7 +69,7 @@ export default function PatientProfilePage() {
               alt={user?.name}
               style={{ width: 120, height: 120, borderRadius: 12, objectFit: 'cover', background: '#eef0ff' }}
             />
-            {/* Upload overlay — always visible, not just in edit mode */}
+            {}
             <button
               type="button"
               onClick={() => fileInputRef.current.click()}
@@ -89,31 +89,7 @@ export default function PatientProfilePage() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/*"
-              style={{ display: 'none' }}
-              onChange={handleAvatarChange}
-            />
-          </div>
-          <div>
-            {isEdit ? (
-              <input
-                className="form-control"
-                style={{ fontSize: '1.2rem', fontWeight: 700, border: 'none', borderBottom: '2px solid #5f6fff', borderRadius: 0, padding: '4px 0', width: 240, boxShadow: 'none' }}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-            ) : (
-              <h2 className="fw-bold" style={{ fontSize: '1.4rem' }}>{name}</h2>
-            )}
-            <div style={{ fontSize: '0.8rem', color: '#9ca3af', marginTop: 2 }}>
-              Click the 📷 icon to change your profile picture
-            </div>
-          </div>
-        </div>
-
-        <hr className="mb-4" />
-
-        {/* Contact info */}
+              accept="image}
         <h3 className="text-muted fw-semibold mb-3" style={{ fontSize: '0.95rem' }}>CONTACT INFORMATION</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: '12px 0', marginBottom: 32, fontSize: '0.9rem' }}>
           <span className="text-muted fw-medium">Email:</span>
@@ -141,7 +117,7 @@ export default function PatientProfilePage() {
 
         <hr className="mb-4" />
 
-        {/* Basic info */}
+        {}
         <h3 className="text-muted fw-semibold mb-3" style={{ fontSize: '0.95rem' }}>BASIC INFORMATION</h3>
         <div style={{ display: 'grid', gridTemplateColumns: '180px 1fr', gap: '12px 0', fontSize: '0.9rem', marginBottom: 32 }}>
           <span className="text-muted fw-medium">Gender:</span>
@@ -164,7 +140,7 @@ export default function PatientProfilePage() {
           )}
         </div>
 
-        {/* Actions */}
+        {}
         {isEdit ? (
           <div className="d-flex gap-3">
             <button className="btn btn-outline-primary rounded" style={{ borderColor: '#5f6fff', color: '#5f6fff', padding: '8px 24px' }} onClick={() => setIsEdit(false)}>

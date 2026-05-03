@@ -6,7 +6,7 @@ import PatientNavbar from '../../components/common/PatientNavbar';
 import { appointmentsAPI, paymentsAPI } from '../../services/api';
 import { assets } from '../../assets/assets';
 
-// Stripe Publishable Key is loaded from .env (VITE_STRIPE_PUBLISHABLE_KEY)
+
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_TYooMQauvdEDq54NiTphI7jx');
 
 const CheckoutForm = ({ appointment, onSuccess }) => {
@@ -33,7 +33,7 @@ const CheckoutForm = ({ appointment, onSuccess }) => {
     });
   }, [appointment]);
 
-  // Allow bypassing Stripe (mark as confirmed manually) — useful when Stripe not configured
+
   const handleBypassPayment = async () => {
     setProcessing(true);
     try {
@@ -74,7 +74,7 @@ const CheckoutForm = ({ appointment, onSuccess }) => {
     }
   };
 
-  // Show Stripe setup instructions if key is missing
+
   if (stripeNotConfigured) {
     return (
       <div>
@@ -98,7 +98,7 @@ const CheckoutForm = ({ appointment, onSuccess }) => {
 
   return (
     <form onSubmit={handleSubmit}>
-      {/* Test card hint box */}
+      {}
       <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: '0.8rem', color: '#92400e' }}>
         <strong>🧪 Test Mode — Use these card details:</strong><br />
         <span style={{ fontFamily: 'monospace' }}>Card: 4242 4242 4242 4242</span><br />
@@ -120,7 +120,7 @@ export default function PaymentPage() {
   const navigate = useNavigate();
 
   const [appointment, setAppointment] = useState(null);
-  const [step, setStep] = useState('form'); // 'form' | 'success'
+  const [step, setStep] = useState('form');
   const [txnId, setTxnId] = useState('');
 
   useEffect(() => {

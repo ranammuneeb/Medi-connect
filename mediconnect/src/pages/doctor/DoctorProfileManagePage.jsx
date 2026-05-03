@@ -72,7 +72,7 @@ export default function DoctorProfileManagePage() {
   const handleSave = async (e) => {
     e.preventDefault();
     
-    // Validation
+
     if (!name.trim()) { alert('Name is required'); return; }
     if (phone && !/^\d+$/.test(phone)) {
       alert('Phone number must contain only digits');
@@ -95,7 +95,7 @@ export default function DoctorProfileManagePage() {
           availability,
           avatar: avatarUrl,
           name,
-          experience: Number(experience) || 0, // Ensure experience is saved
+          experience: Number(experience) || 0,
         });
       }
       updateUser({ name, avatar: avatarUrl });
@@ -117,7 +117,7 @@ export default function DoctorProfileManagePage() {
         </div>
 
         <form onSubmit={handleSave}>
-          {/* Avatar */}
+          {}
           <div className="card shadow-sm border-0 mb-3">
             <div className="card-body d-flex align-items-center gap-4">
               <div style={{ position: 'relative' }}>
@@ -147,15 +147,7 @@ export default function DoctorProfileManagePage() {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={handleAvatarChange}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Basic info */}
+                  accept="image}
           <div className="card shadow-sm border-0 mb-3">
             <div className="card-body">
               <h3 className="fw-semibold mb-3" style={{ fontSize: '0.95rem' }}>Basic Information</h3>
@@ -195,7 +187,7 @@ export default function DoctorProfileManagePage() {
             </div>
           </div>
 
-          {/* Availability */}
+          {}
           <div className="card shadow-sm border-0 mb-4">
             <div className="card-body">
               <h3 className="fw-semibold mb-3" style={{ fontSize: '0.95rem' }}>Availability Schedule</h3>

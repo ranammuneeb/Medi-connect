@@ -42,7 +42,7 @@ export default function AppointmentsOverviewPage() {
           <p className="text-muted" style={{ fontSize: '0.88rem' }}>{filtered.length} of {appointments.length} total</p>
         </div>
 
-        {/* Filters */}
+        {}
         <div className="d-flex gap-3 mb-3 flex-wrap">
           <input
             className="form-control"
@@ -62,7 +62,7 @@ export default function AppointmentsOverviewPage() {
           </select>
         </div>
 
-        {/* Table */}
+        {}
         <div className="card shadow-sm border-0">
           <div className="card-body p-0">
             <div className="table-responsive">

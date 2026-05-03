@@ -19,9 +19,9 @@ export default function ForgotPasswordPage() {
     try {
       const res = await authAPI.forgotPassword({ email });
       setSuccess('Reset token generated successfully! (Dev Note: Token shown below for testing)');
-      // For dev testing, we show the token. In real app, this would be in user's email.
+
       console.log('Reset Token:', res.resetToken);
-      // Auto-navigate to reset page after 2 seconds
+
       setTimeout(() => {
         navigate(`/reset-password?token=${res.resetToken}`);
       }, 3000);

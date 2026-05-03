@@ -8,7 +8,7 @@ const getStripe = () => {
 const processPayment = async (req, res) => {
   try {
     const stripe = getStripe();
-    // Validate Stripe key is set
+
     if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('PLACEHOLDER') || process.env.STRIPE_SECRET_KEY.trim() === '') {
       return res.status(503).json({
         message: 'STRIPE_NOT_CONFIGURED',
@@ -18,7 +18,7 @@ const processPayment = async (req, res) => {
 
     const { appointmentId, amount } = req.body;
     const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(amount * 100), // Amount in cents
+      amount: Math.round(amount * 100),
       currency: 'usd',
       metadata: { appointmentId }
     });
