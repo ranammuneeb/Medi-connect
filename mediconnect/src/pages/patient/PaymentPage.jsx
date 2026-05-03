@@ -65,6 +65,12 @@ const CheckoutForm = ({ appointment, onSuccess }) => {
 
   return (
     <form onSubmit={handleSubmit}>
+      {/* Test card hint box */}
+      <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: '0.8rem', color: '#92400e' }}>
+        <strong>🧪 Test Mode — Use these card details:</strong><br />
+        <span style={{ fontFamily: 'monospace' }}>Card: 4242 4242 4242 4242</span><br />
+        <span style={{ fontFamily: 'monospace' }}>Expiry: any future date &nbsp; CVC: any 3 digits &nbsp; ZIP: any 5 digits (e.g. 12345)</span>
+      </div>
       <div style={{ padding: '16px', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '20px' }}>
         <CardElement options={{ style: { base: { fontSize: '16px', color: '#424770', '::placeholder': { color: '#aab7c4' } }, invalid: { color: '#9e2146' } } }} />
       </div>
@@ -159,7 +165,7 @@ export default function PaymentPage() {
             )}
             
             <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: 12, textAlign: 'center' }}>
-              Secure payment processed by Stripe. Use 4242 4242 4242 4242 for testing.
+              🔒 Secure payment processed by Stripe.
             </p>
           </div>
         )}

@@ -6,6 +6,11 @@ import { useAuth } from '../../context/AuthContext';
 import { doctorsAPI } from '../../services/api';
 import { assets } from '../../assets/assets';
 
+const DAY_NUMBER_TO_NAME = {
+  0: 'Sunday', 1: 'Monday', 2: 'Tuesday', 3: 'Wednesday',
+  4: 'Thursday', 5: 'Friday', 6: 'Saturday',
+};
+
 function getNextDays() {
   const days = [];
   const dayNames = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
@@ -17,18 +22,13 @@ function getNextDays() {
         label: dayNames[d.getDay()],
         date: d.getDate(),
         fullDate: d.toISOString().split('T')[0],
+        dayNumber: d.getDay(),
       });
     }
     d.setDate(d.getDate() + 1);
   }
   return days;
 }
-
-const TIME_SLOTS = [
-  '8:00 am', '8:30 am', '9:00 am', '9:30 am', '10:00 am', '10:30 am',
-  '11:00 am', '11:30 am', '1:00 pm', '1:30 pm', '2:00 pm', '2:30 pm',
-  '3:00 pm', '3:30 pm', '4:00 pm', '4:30 pm',
-];
 
 export default function DoctorProfilePage() {
   const { id } = useParams();
@@ -49,7 +49,6 @@ export default function DoctorProfilePage() {
     doctorsAPI.getById(id)
       .then((doc) => {
         setDoctor(doc);
-        // Fetch related doctors by specialty
         return doctorsAPI.getAll({ specialty: doc.specialty });
       })
       .then((all) => {
@@ -59,25 +58,25 @@ export default function DoctorProfilePage() {
       .finally(() => setLoading(false));
   }, [id]);
 
+  // Get available slots for the selected day from doctor's availability
+  const getAvailableSlots = () => {
+    if (!doctor?.availability) return [];
+    const dayName = DAY_NUMBER_TO_NAME[days[selectedDay].dayNumber];
+    return doctor.availability[dayName] || [];
+  };
+
+  const dayHasSlots = (dayObj) => {
+    if (!doctor?.availability) return false;
+    const dayName = DAY_NUMBER_TO_NAME[dayObj.dayNumber];
+    return (doctor.availability[dayName] || []).length > 0;
+  };
+
+  const availableSlots = getAvailableSlots();
+
   const Navbar = user ? PatientNavbar : LandingNavbar;
 
-  if (loading) {
-    return (
-      <div>
-        <Navbar />
-        <div className="text-center py-5 text-muted"><h2>Loading...</h2></div>
-      </div>
-    );
-  }
-
-  if (!doctor) {
-    return (
-      <div>
-        <Navbar />
-        <div className="text-center py-5 text-muted"><h2>Doctor not found</h2></div>
-      </div>
-    );
-  }
+  if (loading) return <div><Navbar /><div className="text-center py-5 text-muted"><h2>Loading...</h2></div></div>;
+  if (!doctor) return <div><Navbar /><div className="text-center py-5 text-muted"><h2>Doctor not found</h2></div></div>;
 
   return (
     <div>
@@ -86,11 +85,13 @@ export default function DoctorProfilePage() {
       <div className="profile-page">
         {/* Top section */}
         <div className="profile-top">
-          <img
-            src={doctor.avatar || `https://randomuser.me/api/portraits/men/1.jpg`}
-            alt={doctor.name}
-            className="profile-img"
-          />
+          {doctor.avatar ? (
+            <img src={doctor.avatar} alt={doctor.name} className="profile-img" />
+          ) : (
+            <div className="profile-img" style={{ background: '#eef0ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem' }}>
+              👨‍⚕️
+            </div>
+          )}
           <div className="profile-info">
             <div className="profile-name">
               {doctor.name}
@@ -98,15 +99,10 @@ export default function DoctorProfilePage() {
             </div>
             <div className="profile-degree">
               {doctor.specialty}
-              {doctor.experience > 0 && (
-                <span className="profile-exp">{doctor.experience} yrs exp.</span>
-              )}
+              {doctor.experience > 0 && <span className="profile-exp">{doctor.experience} yrs exp.</span>}
             </div>
             <div className="profile-about">
-              <h3>
-                About{' '}
-                <img src={assets.info_icon} alt="" style={{ width: 16, verticalAlign: 'middle' }} />
-              </h3>
+              <h3>About <img src={assets.info_icon} alt="" style={{ width: 16, verticalAlign: 'middle' }} /></h3>
               <p>{doctor.bio || 'No bio provided yet.'}</p>
             </div>
             <div className="fee-row">
@@ -115,38 +111,64 @@ export default function DoctorProfilePage() {
           </div>
         </div>
 
-        {/* Booking slots */}
+        {/* Booking slots — only show doctor's available slots */}
         <div className="slot-section" style={{ marginBottom: 40 }}>
           <h3>Booking slots</h3>
 
+          {/* Day selector with availability indicator */}
           <div className="day-slots">
-            {days.map((day, i) => (
-              <button
-                key={day.fullDate}
-                className={`day-btn ${selectedDay === i ? 'selected' : ''}`}
-                onClick={() => { setSelectedDay(i); setSelectedTime(''); }}
-              >
-                <div style={{ fontSize: '0.75rem' }}>{day.label}</div>
-                <div style={{ fontSize: '1rem', fontWeight: 700 }}>{day.date}</div>
-              </button>
-            ))}
+            {days.map((day, i) => {
+              const hasSlots = dayHasSlots(day);
+              return (
+                <button
+                  key={day.fullDate}
+                  className={`day-btn ${selectedDay === i ? 'selected' : ''}`}
+                  onClick={() => { setSelectedDay(i); setSelectedTime(''); }}
+                  style={{ position: 'relative', opacity: hasSlots ? 1 : 0.4 }}
+                  title={hasSlots ? `${DAY_NUMBER_TO_NAME[day.dayNumber]} — available` : 'No availability'}
+                >
+                  <div style={{ fontSize: '0.75rem' }}>{day.label}</div>
+                  <div style={{ fontSize: '1rem', fontWeight: 700 }}>{day.date}</div>
+                  {hasSlots && (
+                    <div style={{
+                      position: 'absolute', bottom: 4, left: '50%', transform: 'translateX(-50%)',
+                      width: 5, height: 5, borderRadius: '50%',
+                      background: selectedDay === i ? '#fff' : '#5f6fff',
+                    }} />
+                  )}
+                </button>
+              );
+            })}
           </div>
 
-          <div className="time-slots">
-            {TIME_SLOTS.map((slot) => (
-              <button
-                key={slot}
-                className={`time-btn ${selectedTime === slot ? 'selected' : ''}`}
-                onClick={() => setSelectedTime(slot)}
-              >
-                {slot}
-              </button>
-            ))}
-          </div>
+          {/* Time slots — only the doctor's configured slots */}
+          {availableSlots.length === 0 ? (
+            <div style={{
+              padding: '20px', background: '#f9fafb', borderRadius: 10,
+              textAlign: 'center', color: '#9ca3af', fontSize: '0.88rem', margin: '12px 0',
+            }}>
+              <div style={{ fontSize: '1.8rem', marginBottom: 6 }}>📅</div>
+              <strong>No availability on {DAY_NUMBER_TO_NAME[days[selectedDay].dayNumber]}</strong>
+              <p style={{ margin: '4px 0 0', fontSize: '0.8rem' }}>Please select another day.</p>
+            </div>
+          ) : (
+            <div className="time-slots">
+              {availableSlots.map((slot) => (
+                <button
+                  key={slot}
+                  className={`time-btn ${selectedTime === slot ? 'selected' : ''}`}
+                  onClick={() => setSelectedTime(slot)}
+                >
+                  {slot}
+                </button>
+              ))}
+            </div>
+          )}
 
           <button
             className="btn rounded-pill"
-            style={{ background: '#5f6fff', color: '#fff', border: 'none' }}
+            style={{ background: '#5f6fff', color: '#fff', border: 'none', opacity: availableSlots.length === 0 ? 0.5 : 1 }}
+            disabled={availableSlots.length === 0}
             onClick={() => {
               if (!user) { navigate('/auth/login'); return; }
               if (!selectedTime) { alert('Please select a time slot'); return; }
@@ -161,9 +183,7 @@ export default function DoctorProfilePage() {
         {relatedDoctors.length > 0 && (
           <div>
             <p className="h5 fw-bold mb-2">Related Doctors</p>
-            <p className="text-muted mb-4" style={{ fontSize: '0.9rem' }}>
-              Simply browse through our extensive list of trusted doctors.
-            </p>
+            <p className="text-muted mb-4" style={{ fontSize: '0.9rem' }}>Simply browse through our extensive list of trusted doctors.</p>
             <div className="doctors-grid">
               {relatedDoctors.map((doc) => (
                 <div
@@ -171,7 +191,11 @@ export default function DoctorProfilePage() {
                   className="doctor-card"
                   onClick={() => navigate(user ? `/patient/doctors/${doc._id}` : `/all-doctors/${doc._id}`)}
                 >
-                  <img src={doc.avatar || `https://randomuser.me/api/portraits/men/1.jpg`} alt={doc.name} className="doctor-card-img" />
+                  {doc.avatar ? (
+                    <img src={doc.avatar} alt={doc.name} className="doctor-card-img" />
+                  ) : (
+                    <div className="doctor-card-img" style={{ background: '#eef0ff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem' }}>👨‍⚕️</div>
+                  )}
                   <div className="doctor-card-body">
                     <div className="available-dot">Available</div>
                     <div className="doctor-card-name">{doc.name}</div>
