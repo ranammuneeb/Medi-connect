@@ -1,11 +1,15 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Appointment = require('../models/Appointment');
 const Payment = require('../models/Payment');
 
+const getStripe = () => {
+  return require('stripe')(process.env.STRIPE_SECRET_KEY);
+};
+
 const processPayment = async (req, res) => {
   try {
+    const stripe = getStripe();
     // Validate Stripe key is set
-    if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('PLACEHOLDER')) {
+    if (!process.env.STRIPE_SECRET_KEY || process.env.STRIPE_SECRET_KEY.includes('PLACEHOLDER') || process.env.STRIPE_SECRET_KEY.trim() === '') {
       return res.status(503).json({
         message: 'STRIPE_NOT_CONFIGURED',
         detail: 'Stripe secret key is not set. Add your real sk_test_... key to backend/.env'
