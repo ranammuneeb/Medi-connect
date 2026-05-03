@@ -13,6 +13,8 @@ const userSchema = new mongoose.Schema({
   bloodGroup: { type: String },
   avatar: { type: String },
   doctorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor' },
+  resetPasswordToken: { type: String },
+  resetPasswordExpire: { type: Date },
 }, { timestamps: true });
 
 userSchema.pre('save', async function(next) {

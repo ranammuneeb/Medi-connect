@@ -5,6 +5,8 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 // Auth Pages
 import LoginRegisterPage from './pages/auth/LoginRegisterPage';
 import AdminLoginPage from './pages/auth/AdminLoginPage';
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage';
+import ResetPasswordPage from './pages/auth/ResetPasswordPage';
 
 // Public Pages
 import LandingPage from './pages/public/LandingPage';
@@ -52,9 +54,12 @@ export default function App() {
       <Route path="/all-doctors/:id" element={<DoctorProfilePage />} />
 
       {/* Auth */}
+      <Route path="/login" element={<LoginRegisterPage />} />
       <Route path="/auth/login" element={<LoginRegisterPage />} />
       <Route path="/auth/register" element={<LoginRegisterPage />} />
       <Route path="/admin/login" element={<AdminLoginPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
 
       {/* Patient Routes (login required) */}
       <Route path="/patient/*" element={

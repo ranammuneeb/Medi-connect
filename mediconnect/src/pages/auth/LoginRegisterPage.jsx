@@ -130,6 +130,9 @@ export default function LoginRegisterPage() {
             <div className="mb-3">
               <label className="form-label">Password</label>
               <input className="form-control" type="password" placeholder="Enter your password" value={loginPassword} onChange={(e) => setLoginPassword(e.target.value)} />
+              <div className="text-end mt-1">
+                <Link to="/forgot-password" style={{ fontSize: '0.8rem', color: '#5f6fff', textDecoration: 'none' }}>Forgot Password?</Link>
+              </div>
             </div>
             <button type="submit" className="btn w-100 rounded-pill mt-1" style={{ background: '#5f6fff', color: '#fff', border: 'none' }} disabled={loading}>
               {loading ? 'Logging in...' : `Login as ${role === 'patient' ? 'Patient' : 'Doctor'}`}

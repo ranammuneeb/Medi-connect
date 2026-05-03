@@ -623,6 +623,23 @@ body {
 .status-in-progress { background: #e0f2fe; color: #0369a1; }
 .status-completed { background: #dbeafe; color: #1e40af; }
 
+/* ─── Alerts ──────────────────────────────────────────────────────────────── */
+.alert {
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 0.88rem;
+}
+.alert-danger {
+  background-color: #fef2f2;
+  border: 1px solid #fee2e2;
+  color: #b91c1c;
+}
+.alert-success {
+  background-color: #f0fdf4;
+  border: 1px solid #dcfce7;
+  color: #15803d;
+}
+
 /* ─── Footer ──────────────────────────────────────────────────────────────── */
 .footer {
   background: var(--text-dark);
