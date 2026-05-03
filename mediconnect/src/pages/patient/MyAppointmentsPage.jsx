@@ -99,8 +99,8 @@ export default function MyAppointmentsPage() {
                   </span>
                   {isUpcoming && (
                     <button
-                      className="btn btn-sm rounded-pill"
-                      style={{ border: '1px solid #e5e7eb', background: '#fff', color: '#2d3748', fontSize: '0.82rem' }}
+                      className="btn-outline"
+                      style={{ fontSize: '0.82rem', padding: '6px 16px' }}
                       onClick={() => handleCancel(appt._id)}
                     >
                       Cancel appointment
@@ -108,8 +108,8 @@ export default function MyAppointmentsPage() {
                   )}
                   {appt.paymentStatus !== 'paid' && appt.status !== 'cancelled' && (
                     <button
-                      className="btn btn-sm rounded-pill"
-                      style={{ background: '#5f6fff', color: '#fff', border: 'none', fontSize: '0.82rem' }}
+                      className="btn-primary"
+                      style={{ fontSize: '0.82rem', padding: '6px 16px' }}
                       onClick={() => navigate(`/patient/payment/${appt._id}`)}
                     >
                       Pay online

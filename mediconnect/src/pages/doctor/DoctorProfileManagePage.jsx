@@ -137,8 +137,8 @@ export default function DoctorProfileManagePage() {
                 <p className="text-muted mb-2" style={{ fontSize: '0.78rem' }}>Upload a clear photo. Max 5MB.</p>
                 <button
                   type="button"
-                  className="btn btn-sm rounded"
-                  style={{ border: '1px solid #5f6fff', color: '#5f6fff', background: '#fff', fontSize: '0.8rem' }}
+                  className="btn-outline"
+                  style={{ fontSize: '0.8rem', padding: '6px 16px' }}
                   onClick={() => fileInputRef.current.click()}
                   disabled={uploadingAvatar}
                 >
@@ -232,7 +232,7 @@ export default function DoctorProfileManagePage() {
             </div>
           </div>
 
-          <button type="submit" className="btn rounded" style={{ background: '#5f6fff', color: '#fff', border: 'none', padding: '10px 28px' }} disabled={saving || uploadingAvatar}>
+          <button type="submit" className="btn-primary" disabled={saving || uploadingAvatar}>
             {saving ? 'Saving...' : 'Save changes'}
           </button>
         </form>

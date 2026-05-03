@@ -87,7 +87,7 @@ export default function ManageDoctorsPage() {
             <h1 className="fw-bold mb-1" style={{ fontSize: '1.4rem' }}>Doctors List</h1>
             <p className="text-muted" style={{ fontSize: '0.88rem' }}>{doctorsList.length} doctors registered</p>
           </div>
-          <button className="btn rounded" style={{ background: '#5f6fff', color: '#fff', border: 'none', padding: '9px 20px' }} onClick={openAdd}>+ Add Doctor</button>
+          <button className="btn-primary" onClick={openAdd}>+ Add Doctor</button>
         </div>
 
         {/* Search */}
@@ -142,8 +142,8 @@ export default function ManageDoctorsPage() {
                       <td>⭐ {doc.rating}</td>
                       <td>
                         <div className="d-flex gap-2">
-                          <button onClick={() => openEdit(doc)} className="btn btn-sm btn-outline-primary" style={{ borderColor: '#5f6fff', color: '#5f6fff', fontSize: '0.8rem' }}>Edit</button>
-                          <button onClick={() => handleDelete(doc._id)} className="btn btn-sm btn-outline-danger" style={{ fontSize: '0.8rem' }}>Delete</button>
+                          <button onClick={() => openEdit(doc)} className="btn-outline" style={{ fontSize: '0.78rem', padding: '4px 12px' }}>Edit</button>
+                          <button onClick={() => handleDelete(doc._id)} className="btn-outline" style={{ fontSize: '0.78rem', padding: '4px 12px', color: '#ef4444' }}>Delete</button>
                         </div>
                       </td>
                     </tr>
@@ -210,8 +210,8 @@ export default function ManageDoctorsPage() {
                   </div>
                 </div>
                 <div className="d-flex gap-2 mt-4">
-                  <button type="button" className="btn btn-outline-primary rounded" style={{ borderColor: '#5f6fff', color: '#5f6fff', padding: '9px 20px' }} onClick={() => setShowModal(false)}>Cancel</button>
-                  <button type="submit" className="btn rounded" style={{ background: '#5f6fff', color: '#fff', border: 'none', padding: '9px 20px' }} disabled={saving}>
+                  <button type="button" className="btn-outline" style={{ width: '50%' }} onClick={() => setShowModal(false)}>Cancel</button>
+                  <button type="submit" className="btn-primary" style={{ width: '50%' }} disabled={saving}>
                     {saving ? 'Saving...' : 'Save'}
                   </button>
                 </div>

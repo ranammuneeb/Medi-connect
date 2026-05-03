@@ -684,6 +684,38 @@ body {
   font-size: 0.82rem;
 }
 
+/* ─── Buttons ─────────────────────────────────────────────────────────────── */
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.2s;
+  display: inline-block;
+  text-align: center;
+}
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-primary:disabled { background: var(--text-light); cursor: not-allowed; }
+
+.btn-outline {
+  background: #fff;
+  color: var(--text-gray);
+  border: 1px solid var(--border);
+  padding: 10px 24px;
+  border-radius: 50px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-block;
+  text-align: center;
+}
+.btn-outline:hover { border-color: var(--primary); color: var(--primary); }
+
 /* ─── Misc Utilities ──────────────────────────────────────────────────────── */
 .cursor-pointer { cursor: pointer; }
 .skeleton {
