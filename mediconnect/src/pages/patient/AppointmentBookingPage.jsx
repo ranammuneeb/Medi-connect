@@ -91,7 +91,7 @@ export default function AppointmentBookingPage() {
   return (
     <div>
       <PatientNavbar />
-      <div className="booking-page">
+      <div className="booking-page" style={{ maxWidth: 900, margin: '40px auto', padding: '0 20px' }}>
 
         {/* Doctor info row */}
         <div style={{
