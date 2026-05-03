@@ -117,7 +117,6 @@ export default function DoctorProfileManagePage() {
         </div>
 
         <form onSubmit={handleSave}>
-          {}
           <div className="card shadow-sm border-0 mb-3">
             <div className="card-body d-flex align-items-center gap-4">
               <div style={{ position: 'relative' }}>
@@ -147,7 +146,14 @@ export default function DoctorProfileManagePage() {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept="image}
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={handleAvatarChange}
+                />
+              </div>
+            </div>
+          </div>
+
           <div className="card shadow-sm border-0 mb-3">
             <div className="card-body">
               <h3 className="fw-semibold mb-3" style={{ fontSize: '0.95rem' }}>Basic Information</h3>
@@ -187,7 +193,6 @@ export default function DoctorProfileManagePage() {
             </div>
           </div>
 
-          {}
           <div className="card shadow-sm border-0 mb-4">
             <div className="card-body">
               <h3 className="fw-semibold mb-3" style={{ fontSize: '0.95rem' }}>Availability Schedule</h3>
