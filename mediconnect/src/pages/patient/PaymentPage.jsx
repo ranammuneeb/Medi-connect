@@ -1,61 +1,105 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import PatientNavbar from '../../components/common/PatientNavbar';
 import { appointmentsAPI, paymentsAPI } from '../../services/api';
 import { assets } from '../../assets/assets';
+
+// Replace with your Stripe publishable key
+const stripePromise = loadStripe('pk_test_TYooMQauvdEDq54NiTphI7jx');
+
+const CheckoutForm = ({ appointment, onSuccess }) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [error, setError] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [clientSecret, setClientSecret] = useState('');
+
+  useEffect(() => {
+    // Create PaymentIntent as soon as the component loads
+    paymentsAPI.processPayment({
+      appointmentId: appointment._id,
+      amount: appointment.fee,
+    }).then(res => {
+      setClientSecret(res.clientSecret);
+    }).catch(err => {
+      setError('Failed to initialize payment.');
+    });
+  }, [appointment]);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!stripe || !elements || !clientSecret) {
+      return;
+    }
+
+    setProcessing(true);
+    setError(null);
+
+    const payload = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: elements.getElement(CardElement),
+        billing_details: {
+          name: appointment.patientName,
+        },
+      },
+    });
+
+    if (payload.error) {
+      setError(`Payment failed: ${payload.error.message}`);
+      setProcessing(false);
+    } else {
+      // Payment succeeded!
+      try {
+        await paymentsAPI.confirmPayment(appointment._id);
+        setProcessing(false);
+        onSuccess(payload.paymentIntent.id);
+      } catch (err) {
+        setError('Payment confirmed but failed to update appointment. Please contact support.');
+        setProcessing(false);
+      }
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div style={{ padding: '16px', border: '1px solid #e5e7eb', borderRadius: '8px', marginBottom: '20px' }}>
+        <CardElement options={{ style: { base: { fontSize: '16px', color: '#424770', '::placeholder': { color: '#aab7c4' } }, invalid: { color: '#9e2146' } } }} />
+      </div>
+      {error && <div style={{ color: '#ef4444', marginBottom: '16px', fontSize: '0.85rem' }}>{error}</div>}
+      <button disabled={processing || !stripe || !clientSecret} className="btn-primary" style={{ width: '100%', marginTop: 8 }}>
+        {processing ? 'Processing...' : `Pay $${appointment.fee}`}
+      </button>
+    </form>
+  );
+};
 
 export default function PaymentPage() {
   const { appointmentId } = useParams();
   const navigate = useNavigate();
 
   const [appointment, setAppointment] = useState(null);
-  const [step, setStep] = useState('form'); // 'form' | 'processing' | 'success' | 'failed'
+  const [step, setStep] = useState('form'); // 'form' | 'success'
   const [txnId, setTxnId] = useState('');
-  const [error, setError] = useState('');
-
-  // card fields
-  const [cardName, setCardName] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [expiry, setExpiry] = useState('');
-  const [cvv, setCvv] = useState('');
 
   useEffect(() => {
     appointmentsAPI.getAll().then((all) => {
-      const appt = all.find((a) => String(a.id) === String(appointmentId));
+      const appt = all.find((a) => String(a._id) === String(appointmentId) || String(a.id) === String(appointmentId));
       setAppointment(appt || null);
     });
   }, [appointmentId]);
 
-  const handlePay = async (e) => {
-    e.preventDefault();
-    setError('');
-    if (!cardName || !cardNumber || !expiry || !cvv) { setError('Please fill all card details'); return; }
-    setStep('processing');
-    try {
-      const result = await paymentsAPI.processPayment({
-        appointmentId,
-        amount: appointment?.fee || 0,
-        cardNumber,
-      });
-      setTxnId(result.transactionId);
-      setStep('success');
-    } catch (err) {
-      setStep('failed');
-    }
+  const handleSuccess = (transactionId) => {
+    setTxnId(transactionId);
+    setStep('success');
   };
 
   return (
     <div>
       <PatientNavbar />
       <div style={{ maxWidth: 560, margin: '40px auto', padding: '0 20px' }}>
-
-        {step === 'processing' && (
-          <div style={{ textAlign: 'center', padding: '80px 0' }}>
-            <div style={{ fontSize: '3rem', marginBottom: 16 }}>⏳</div>
-            <h3 style={{ fontWeight: 700, marginBottom: 8 }}>Processing Payment...</h3>
-            <p style={{ color: '#6b7280' }}>Please do not close this window</p>
-          </div>
-        )}
 
         {step === 'success' && (
           <div style={{ textAlign: 'center', padding: '60px 20px', border: '2px solid #10b981', borderRadius: 16, background: '#f0fdf4' }}>
@@ -75,85 +119,47 @@ export default function PaymentPage() {
           </div>
         )}
 
-        {step === 'failed' && (
-          <div style={{ textAlign: 'center', padding: '60px 20px', border: '2px solid #ef4444', borderRadius: 16, background: '#fef2f2' }}>
-            <div style={{ fontSize: '4rem', marginBottom: 16 }}>❌</div>
-            <h3 style={{ fontWeight: 700, color: '#991b1b', marginBottom: 8 }}>Payment Failed</h3>
-            <p style={{ color: '#6b7280', marginBottom: 20 }}>Your card was declined. Please try again.</p>
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
-              <button className="btn-primary" style={{ background: '#ef4444' }} onClick={() => setStep('form')}>Try Again</button>
-              <button className="btn-outline" onClick={() => navigate('/patient/appointments')}>Back to Appointments</button>
-            </div>
-          </div>
-        )}
-
         {step === 'form' && (
           <div>
             <h2 style={{ fontWeight: 700, marginBottom: 24 }}>Complete Payment</h2>
 
-            {/* Order summary */}
-            {appointment && (
-              <div style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: '16px 20px', marginBottom: 24, background: '#fff', fontSize: '0.9rem' }}>
-                <h3 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 12 }}>Order Summary</h3>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <span style={{ color: '#6b7280' }}>Doctor</span>
-                  <strong>{appointment.doctorName}</strong>
+            {appointment ? (
+              <>
+                <div style={{ border: '1px solid #e5e7eb', borderRadius: 12, padding: '16px 20px', marginBottom: 24, background: '#fff', fontSize: '0.9rem' }}>
+                  <h3 style={{ fontSize: '0.95rem', fontWeight: 600, marginBottom: 12 }}>Order Summary</h3>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ color: '#6b7280' }}>Doctor</span>
+                    <strong>{appointment.doctorName}</strong>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <span style={{ color: '#6b7280' }}>Date & Time</span>
+                    <strong>{appointment.date} • {appointment.time}</strong>
+                  </div>
+                  <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '10px 0' }} />
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <strong>Total</strong>
+                    <strong style={{ color: '#5f6fff', fontSize: '1.1rem' }}>${appointment.fee}</strong>
+                  </div>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-                  <span style={{ color: '#6b7280' }}>Date & Time</span>
-                  <strong>{appointment.date} • {appointment.time}</strong>
+
+                <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
+                  <img src={assets.stripe_logo} alt="Stripe" style={{ height: 28, border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 8px', cursor: 'pointer' }} />
                 </div>
-                <hr style={{ border: 'none', borderTop: '1px solid #e5e7eb', margin: '10px 0' }} />
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <strong>Total</strong>
-                  <strong style={{ color: '#5f6fff', fontSize: '1.1rem' }}>${appointment.fee}</strong>
-                </div>
-              </div>
+
+                <Elements stripe={stripePromise}>
+                  <CheckoutForm appointment={appointment} onSuccess={handleSuccess} />
+                </Elements>
+
+                <button type="button" className="btn-outline" style={{ width: '100%', marginTop: 10, borderRadius: 8 }} onClick={() => navigate(-1)}>
+                  Cancel
+                </button>
+              </>
+            ) : (
+              <p>Loading appointment details...</p>
             )}
-
-            {/* Payment methods */}
-            <div style={{ display: 'flex', gap: 12, marginBottom: 20 }}>
-              <img src={assets.stripe_logo} alt="Stripe" style={{ height: 28, border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 8px', cursor: 'pointer' }} />
-              <img src={assets.razorpay_logo} alt="Razorpay" style={{ height: 28, border: '1px solid #e5e7eb', borderRadius: 6, padding: '4px 8px', cursor: 'pointer' }} />
-            </div>
-
-            {/* Card form */}
-            <form onSubmit={handlePay}>
-              <div className="form-group">
-                <label className="form-label">Cardholder Name</label>
-                <input className="form-input" placeholder="John Doe" value={cardName} onChange={(e) => setCardName(e.target.value)} />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Card Number</label>
-                <input className="form-input" placeholder="1234 5678 9012 3456" maxLength={19} value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} />
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label className="form-label">Expiry Date</label>
-                  <input className="form-input" placeholder="MM / YY" value={expiry} onChange={(e) => setExpiry(e.target.value)} />
-                </div>
-                <div className="form-group">
-                  <label className="form-label">CVV</label>
-                  <input className="form-input" type="password" placeholder="•••" maxLength={4} value={cvv} onChange={(e) => setCvv(e.target.value)} />
-                </div>
-              </div>
-
-              {error && (
-                <div style={{ background: '#fee2e2', color: '#991b1b', padding: '10px 14px', borderRadius: 8, fontSize: '0.85rem', marginBottom: 16 }}>
-                  {error}
-                </div>
-              )}
-
-              <button type="submit" className="btn-primary" style={{ width: '100%', marginTop: 8 }}>
-                Pay ${appointment?.fee || '...'}
-              </button>
-              <button type="button" className="btn-outline" style={{ width: '100%', marginTop: 10, borderRadius: 8 }} onClick={() => navigate(-1)}>
-                Cancel
-              </button>
-            </form>
-
+            
             <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginTop: 12, textAlign: 'center' }}>
-              Demo: any card = success. Card ending in 0000 = failure.
+              Secure payment processed by Stripe. Use 4242 4242 4242 4242 for testing.
             </p>
           </div>
         )}
