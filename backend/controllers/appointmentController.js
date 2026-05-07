@@ -19,17 +19,32 @@ const getAppointments = async (req, res) => {
 const bookAppointment = async (req, res) => {
   try {
     const { patientId, patientName, patientEmail, patientPhone, doctorId, doctorName, specialty, date, time, symptoms, fee } = req.body;
-    
+
+    const existingAppointment = await Appointment.findOne({
+      doctorId,
+      date,
+      time,
+      status: { $ne: 'cancelled' },
+    });
+
+    if (existingAppointment) {
+      return res.status(409).json({ message: 'This slot is already booked' });
+    }
 
     const doctor = await Doctor.findById(doctorId);
     const doctorAvatar = doctor ? doctor.avatar : '';
 
+    await Appointment.deleteMany({ doctorId, date, time, status: 'cancelled' });
+
     const appointment = await Appointment.create({
       patientId, patientName, patientEmail, patientPhone, doctorId, doctorName, doctorAvatar, specialty, date, time, symptoms, fee
     });
-    
+
     res.status(201).json(appointment);
   } catch (error) {
+    if (error.code === 11000) {
+      return res.status(409).json({ message: 'This slot is already booked' });
+    }
     res.status(500).json({ message: error.message });
   }
 };

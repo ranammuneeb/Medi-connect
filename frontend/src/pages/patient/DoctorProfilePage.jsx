@@ -189,7 +189,7 @@ export default function DoctorProfilePage() {
                 <div
                   key={doc._id}
                   className="doctor-card"
-                  onClick={() => navigate(user ? `/patient/doctors/${doc._id}` : `/all-doctors/${doc._id}`)}
+                  onClick={() => navigate(user ? `/patient/book/${doc._id}` : `/all-doctors/${doc._id}`)}
                 >
                   {doc.avatar ? (
                     <img src={doc.avatar} alt={doc.name} className="doctor-card-img" />

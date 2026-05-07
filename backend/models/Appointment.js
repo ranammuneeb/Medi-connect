@@ -17,4 +17,6 @@ const appointmentSchema = new mongoose.Schema({
   paymentStatus: { type: String, enum: ['pending', 'paid', 'refunded'], default: 'pending' },
 }, { timestamps: true });
 
+appointmentSchema.index({ doctorId: 1, date: 1, time: 1 }, { unique: true });
+
 module.exports = mongoose.model('Appointment', appointmentSchema);

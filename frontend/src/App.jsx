@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 
@@ -26,6 +26,11 @@ import AppointmentsOverviewPage from './pages/admin/AppointmentsOverviewPage';
 import DoctorDashboardPage from './pages/doctor/DoctorDashboardPage';
 import DoctorAppointmentsPage from './pages/doctor/DoctorAppointmentsPage';
 import DoctorProfileManagePage from './pages/doctor/DoctorProfileManagePage';
+
+function DoctorToBookRedirect() {
+  const { id } = useParams();
+  return <Navigate to={`/patient/book/${id}`} replace />;
+}
 
 function RootRedirect() {
   const { user } = useAuth();
@@ -58,12 +63,12 @@ export default function App() {
           <Routes>
             <Route path="home" element={<HomePage />} />
             <Route path="doctors" element={<DoctorListingPage />} />
-            <Route path="doctors/:id" element={<DoctorProfilePage />} />
+            <Route path="doctors/:id" element={<DoctorToBookRedirect />} />
             <Route path="book/:doctorId" element={<AppointmentBookingPage />} />
             <Route path="payment/:appointmentId" element={<PaymentPage />} />
             <Route path="appointments" element={<MyAppointmentsPage />} />
             <Route path="profile" element={<PatientProfilePage />} />
-            <Route path="*" element={<Navigate to="home" replace />} />
+            <Route path="*" element={<Navigate to="/patient/home" replace />} />
           </Routes>
         </ProtectedRoute>
       } />
