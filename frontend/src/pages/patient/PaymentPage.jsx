@@ -100,7 +100,7 @@ const CheckoutForm = ({ appointment, onSuccess }) => {
     <form onSubmit={handleSubmit}>
       {}
       <div style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: '0.8rem', color: '#92400e' }}>
-        <strong>🧪 Test Mode — Use these card details:</strong><br />
+        <strong>Test Mode , Use these card details:</strong><br />
         <span style={{ fontFamily: 'monospace' }}>Card: 4242 4242 4242 4242</span><br />
         <span style={{ fontFamily: 'monospace' }}>Expiry: any future date &nbsp; CVC: any 3 digits &nbsp; ZIP: any 5 digits (e.g. 12345)</span>
       </div>
